@@ -1,0 +1,43 @@
+File: 3dpendulum.in
+-----------------------------------------------------------------------------
+Replace this line with a message to appear on all output files.
+----------------------------------------------------------+------------------
+Description          Quantity             Units           | Value
+----------------------------------------------------------|------------------
+Constant:            G                    UNITS           |  0.0
+Constant:            IX                   UNITS           |  0.0
+Constant:            IY                   UNITS           |  0.0
+Constant:            IZ                   UNITS           |  0.0
+Constant:            LA                   UNITS           |  0.0
+Constant:            LAO                  UNITS           |  0.0
+Constant:            M                    UNITS           |  0.0
+
+Initial Value:       Q1                   UNITS           |  0.0
+Initial Value:       Q2                   UNITS           |  0.0
+Initial Value:       Q3                   UNITS           |  0.0
+Initial Value:       Q4                   UNITS           |  0.0
+Initial Value:       Q5                   UNITS           |  0.0
+Initial Value:       Q6                   UNITS           |  0.0
+Initial Value:       U4                   UNITS           |  0.0
+Initial Value:       U5                   UNITS           |  0.0
+Initial Value:       U6                   UNITS           |  0.0
+
+Initial Time:        TINITIAL             UNITS           |  0.0
+Final Time:          TFINAL               UNITS           |  1.0
+Integration Step:    INTEGSTP             UNITS           |  0.1
+Print-Integer:       PRINTINT             Positive Integer|  1
+Absolute Error:      ABSERR                               |  1.0E-08
+Relative Error:      RELERR                               |  1.0E-07
+----------------------------------------------------------+------------------
+
+DANGER: Do not insert TABS while editing this file.
+
+Note:
+
+  INTEGSTP*PRINTINT is the time-interval for writing of output.
+
+  ABSERR should be set equal to 10^(-8)*Xsmall, where Xsmall is the estimated
+         smallest maximum absolute value of the variables being integrated.
+
+  RELERR should be set equal to 10^(-d), where d is the desired number of
+         significant digits of numerical integration results.
