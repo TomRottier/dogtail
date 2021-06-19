@@ -103,6 +103,6 @@ output t,ke,pe,te,amomx,amomy,amomz
 input abserr=1.0e-08, relerr=1.0e-07
 %--------------------------------------------------------------------
 %   generate code
-code dynamics() dogtail_torque.f, nosubs
+code dynamics() dogtail.f, nosubs
 
 
