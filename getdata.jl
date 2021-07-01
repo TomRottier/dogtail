@@ -12,9 +12,9 @@ function getdata(fname)
     base_marker = "SchwAns"; mid_marker = "Schw"; tip_marker = "SchwSpi"
     mnames = markers["Labels"] |> vec
 
-    base = mdata[:, 1:3, base_marker .== mnames] ./ 1000 # Get in m
-    mid  = mdata[:, 1:3, mid_marker .== mnames]  ./ 1000 
-    tip  = mdata[:, 1:3, tip_marker .== mnames]  ./ 1000 
+    base = mdata[:, 1:3, base_marker .== mnames][:,:,1] ./ 1000 # Get in m
+    mid  = mdata[:, 1:3, mid_marker .== mnames][:,:,1]  ./ 1000 
+    tip  = mdata[:, 1:3, tip_marker .== mnames][:,:,1]  ./ 1000 
 
     # Plot to check
     # anim = @animate for t ∈ 1:size(base, 1)
@@ -32,12 +32,31 @@ function getdata(fname)
     # gif(anim, "recorded.gif")
 
 
-    # Fit quintic spline to base data
+    # Fit quintic spline to data
     hz = data["FrameRate"]; n = data["Frames"]
     time = range(0, step=1 / hz, length=Int(n))
-    splx = Spline1D(time, base[:,1]) 
-    sply = Spline1D(time, base[:,2]) 
-    splz = Spline1D(time, base[:,3])
+    splx = Spline1D(time, base[:,1], k=5) 
+    sply = Spline1D(time, base[:,2], k=5) 
+    splz = Spline1D(time, base[:,3], k=5)
+    mid_splx = Spline1D(time, mid[:,1], k=5) 
+    mid_sply = Spline1D(time, mid[:,2], k=5) 
+    mid_splz = Spline1D(time, mid[:,3], k=5)
+    tip_splx = Spline1D(time, tip[:,1], k=5) 
+    tip_sply = Spline1D(time, tip[:,2], k=5) 
+    tip_splz = Spline1D(time, tip[:,3], k=5)
 
-    return splx, sply, splz, base, mid, tip
+    # Initial conditions
+    initcond_base = [base[1,:]..., derivative(splx, 0, 1), derivative(sply, 0, 1), derivative(splz, 0, 1)]
+    initcond_mid = [mid[1,:]..., derivative(mid_splx, 0, 1), derivative(mid_sply, 0, 1), derivative(mid_splz, 0, 1)]
+    initcond_tip = [tip[1,:]..., derivative(tip_splx, 0, 1), derivative(tip_sply, 0, 1), derivative(tip_splz, 0, 1)]
+    initconds = [initcond_base; initcond_mid; initcond_tip]
+
+    # Segment lengths
+    la = sqrt.(sum((mid - base).^2, dims=2)) |> mean
+    lb = sqrt.(sum((tip - mid).^2, dims=2))  |> mean
+
+    # Time span
+    tspan = (0, time[end])
+
+    return splx, sply, splz, base, mid, tip, initconds, la, lb, tspan
 end

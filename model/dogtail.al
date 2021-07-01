@@ -25,8 +25,8 @@ constants g
 specified px'', py'', pz''  % Position and derivatives of base
 %--------------------------------------------------------------------
 %   Geometry relating unit vectors
-dircos(n, a, space123, q1, q2, q3)
-dircos(a, b, space123, q4, q5, q6)
+dircos(n, a, body123, q1, q2, q3)
+dircos(a, b, body123, q4, q5, q6)
 %--------------------------------------------------------------------
 %   Position vectors
 p_o_p1> = px*n1> + py*n2> + pz*n3>  % From origin to base of first seg
@@ -40,8 +40,8 @@ w_a_n> = u1*a1> + u2*a2> + u3*a3>
 w_b_a> = u4*b1> + u5*b2> + u6*b3>
 %--------------------------------------------------------------------
 %   Kinematical differential equations
-kindiffs(n, a, space123, q1, q2, q3)
-kindiffs(a, b, space123, q4, q5, q6)
+kindiffs(n, a, body123, q1, q2, q3)
+kindiffs(a, b, body123, q4, q5, q6)
 %--------------------------------------------------------------------
 %   Velocities
 v_o_n> = 0>
@@ -95,6 +95,27 @@ p3x = dot(p_o_p3>, n1>)
 p3y = dot(p_o_p3>, n2>)
 p3z = dot(p_o_p3>, n3>)
 %--------------------------------------------------------------------
+%   Set up system of non-linear equations to solve for Q's and U's
+vp2x = dot( dt(p_o_p2>, n), n1>)
+vp2y = dot( dt(p_o_p2>, n), n2>)
+vp2z = dot( dt(p_o_p2>, n), n3>)
+vp3x = dot( dt(p_o_p3>, n), n1>)
+vp3y = dot( dt(p_o_p3>, n), n2>)
+vp3z = dot( dt(p_o_p3>, n), n3>)
+
+out[1] = p2x - rhs(p2x)
+out[2] = p2y - rhs(p2y)
+out[3] = p2z - rhs(p2z)
+out[4] = p3x - rhs(p3x)
+out[5] = p3y - rhs(p3y)
+out[6] = p3z - rhs(p3z)
+out[7] = vp2x - rhs(vp2x)
+out[8] = vp2y - rhs(vp2y)
+out[9] = vp2z - rhs(vp2z)
+out[10] = vp3x - rhs(vp3x)
+out[11] = vp3y - rhs(vp3y)
+out[12] = vp3z - rhs(vp3z)
+%--------------------------------------------------------------------
 %   Outputs
 output t,p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z
 output t,ke,pe,te,amomx,amomy,amomz
@@ -103,6 +124,7 @@ output t,ke,pe,te,amomx,amomy,amomz
 input abserr=1.0e-08, relerr=1.0e-07
 %--------------------------------------------------------------------
 %   generate code
+code nonlinear(out,q1,q2,q3,q4,q5,q6,u1,u2,u3,u4,u5,u6) invkin.f
 code dynamics() dogtail.f, nosubs
 
 
