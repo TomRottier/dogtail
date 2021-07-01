@@ -20,7 +20,6 @@ prob = ODEProblem(eom!, u₀, tspan, p)
 sol = solve(prob, Tsit5(), abstol=1e-8, reltol=1e-7)
 
 # Compare simulation output to measured data
-testing
 include("model/functions.jl")
 time = collect(range(tspan[1], tspan[2], length=size(base, 1)))
 base_sim = [splx(time) sply(time) splz(time)]
