@@ -1,5 +1,5 @@
 function eom!(du, u, p, t)
-    ma, ixa, iya, iza, lao, la, mb, ixb, iyb, izb, lbo, lb, g, ka, kb, ba, bb = p
+    la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = u
 
     pxpp = derivative(p.fx, t, 2)

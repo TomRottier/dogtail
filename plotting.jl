@@ -1,7 +1,7 @@
 function animate_comparison(base, mid, tip, base_sim, mid_sim, tip_sim)
-    mins = minimum([base; mid; tip], dims=1); maxs = maximum([base; mid; tip], dims=1)
+    mins = minimum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1); maxs = maximum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1)
 
-    anim = @animate for (index, t) ∈ enumerate(time)
+    anim = @animate for (index, t) ∈ enumerate(times)
         # Trajectory
         plot(base[:,1], base[:,2], base[:,3], label="", ls=:dash, color=:black)
         # Base
