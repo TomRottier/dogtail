@@ -3,8 +3,8 @@ using NLsolve
 
 function getinitcond(initconds, p)
 
-    px, py, pz, pxp, pyp, pzp, p2x, p2y, p2z, vp2x, vp2y, vp2z, p3x, p3y, p3z, vp3x, vp3y, vp3z = initconds
-    la = p.la; lb = p.lb
+    @inbounds px, py, pz, pxp, pyp, pzp, p2x, p2y, p2z, vp2x, vp2y, vp2z, p3x, p3y, p3z, vp3x, vp3y, vp3z = initconds
+    @inbounds la, lb = p
     
     function f!(F, x)
         q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = x
@@ -33,7 +33,7 @@ function getinitcond(initconds, p)
 
 
 
-    sol = nlsolve(f!, repeat([0.], 12), method=:trust_region, store_trace=true, extended_trace=true, autodiff=:forward)
+    sol = nlsolve(f!, repeat([rand()], 12), method=:trust_region, store_trace=true, extended_trace=true, autodiff=:forward)
 
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol.zero
     

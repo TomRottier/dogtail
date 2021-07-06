@@ -2,9 +2,9 @@ function eom!(du, u, p, t)
     @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
     @inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = u
 
-    pxpp = derivative(p.fx, t, 2)
-    pypp = derivative(p.fy, t, 2)
-    pzpp = derivative(p.fz, t, 2)
+    pxpp = derivative(fx, t, 2)
+    pypp = derivative(fy, t, 2)
+    pzpp = derivative(fz, t, 2)
     
     coef = Matrix{Float64}(undef, 6, 6)
     rhs = Vector{Float64}(undef, 6)

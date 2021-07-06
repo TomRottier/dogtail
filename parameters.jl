@@ -10,5 +10,5 @@ function getparameters(pin)
     iyb = izb = 1 / 12 * mb * lbo
     g = -9.81
 
-    return (la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx = fx, fy = fy, fz = fz, ka, kb, ba, bb, ma, mb)
+    return (la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb)
 end

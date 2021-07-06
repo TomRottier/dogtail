@@ -1,6 +1,6 @@
 ##### Location of points
 function p2(sol, t)
-    la = sol.prob.p.la
+    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
     q1, q2, q3 = sol(t)
 
     # space123
@@ -9,15 +9,15 @@ function p2(sol, t)
     # p2z = sol.prob.p.fz(t) - la * sin(q2)
 
     # body123
-    p2x = sol.prob.p.fx(t) + la * cos(q2) * cos(q3)
-    p2y = sol.prob.p.fy(t) + la * (sin(q3) * cos(q1) + sin(q1) * sin(q2) * cos(q3))
-    p2z = sol.prob.p.fz(t) + la * (sin(q1) * sin(q3) - sin(q2) * cos(q1) * cos(q3))
+    p2x = fx(t) + la * cos(q2) * cos(q3)
+    p2y = fy(t) + la * (sin(q3) * cos(q1) + sin(q1) * sin(q2) * cos(q3))
+    p2z = fz(t) + la * (sin(q1) * sin(q3) - sin(q2) * cos(q1) * cos(q3))
 
     return p2x, p2y, p2z
 end
 
 function p3(sol, t; retp2=false)
-    lb = sol.prob.p.lb
+    @inbounds la, lb = sol.prob.p
     q1, q2, q3, q4, q5, q6 = sol(t)
 
     p2x, p2y, p2z = p2(sol, t)
@@ -43,10 +43,11 @@ p3(sol; retp2=false) = [p3(sol, t, retp2=retp2) for t ∈ sol.t]
 
 ######## Plotting
 function plot_model(sol, t; tip=false)
+    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
     # px, py, pz = sol.prob.p.f(t)
-    px = sol.prob.p.fx(t)
-    py = sol.prob.p.fy(t)
-    pz = sol.prob.p.fz(t)
+    px = fx(t)
+    py = fy(t)
+    pz = fz(t)
 
 
     p2x, p2y, p2z, p3x, p3y, p3z = p3(sol, t, retp2=true)
@@ -97,9 +98,9 @@ function kineticenergy(sol, t)
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
 
     # pxp, pyp, pzp = sol.prob.p.fp(t)
-    pxp = derivative(sol.prob.p.fx, t, 1)
-    pyp = derivative(sol.prob.p.fy, t, 1)
-    pzp = derivative(sol.prob.p.fz, t, 1)
+    pxp = derivative(fx, t, 1)
+    pyp = derivative(fy, t, 1)
+    pzp = derivative(fz, t, 1)
 
     # space 123
     # return 0.5 * ixa * u1^2 + 0.5 * iya * u2^2 + 0.5 * iza * u3^2 + 0.5 * ixb * sin(q5) * u3 * (sin(q5) * u3 - u4 - sin(q6) * cos(q5) * u2 - cos(q5) * cos(q6) * u1) + 0.5 * iyb * u5 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) + 0.5 * izb * u6 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) + 0.5 * iyb * sin(q4) * cos(q5) * u3 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) + 0.5 * izb * cos(q4) * cos(q5) * u3 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) + 0.5 * iyb * (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) + 0.5 * izb * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) + 0.5 * mb * (pxp^2 + pyp^2 + pzp^2 + la^2 * u2^2 + la^2 * u3^2 + 2 * la * pzp * sin(q1) * cos(q2) * u3 + 2 * la * pyp * (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)) * u3 + 2 * la * pyp * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) * u2 + lbo^2 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1)^2 + lbo^2 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2)^2 + 2 * la * lbo * cos(q4) * cos(q5) * u2 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) + 2 * la * lbo * (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u3 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) + 2 * la * lbo * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u3 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) + 2 * lbo * pzp * (sin(q4) * cos(q1) * cos(q2) * cos(q5) + sin(q2) * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) + sin(q1) * cos(q2) * (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6))) * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) + 2 * lbo * pxp * (sin(q4) * cos(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) - cos(q2) * cos(q3) * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) - (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3))) * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) - 2 * la * pzp * cos(q1) * cos(q2) * u2 - 2 * la * pxp * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) * u2 - 2 * la * pxp * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)) * u3 - 2 * la * lbo * sin(q4) * cos(q5) * u2 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) - 2 * lbo * pzp * (cos(q1) * cos(q2) * cos(q4) * cos(q5) - sin(q2) * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) - sin(q1) * cos(q2) * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4))) * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) - 2 * lbo * pxp * (cos(q2) * cos(q3) * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) + cos(q4) * cos(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) + (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)) * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4))) * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) - 2 * lbo * pyp * (sin(q3) * cos(q2) * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) + sin(q4) * cos(q5) * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) - (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)) * (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6))) * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) - 2 * lbo * pyp * (sin(q3) * cos(q2) * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) - cos(q4) * cos(q5) * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) - (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)) * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4))) * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1)) - 0.5 * ixb * u4 * (sin(q5) * u3 - u4 - sin(q6) * cos(q5) * u2 - cos(q5) * cos(q6) * u1) - 0.5 * ixb * sin(q6) * cos(q5) * u2 * (sin(q5) * u3 - u4 - sin(q6) * cos(q5) * u2 - cos(q5) * cos(q6) * u1) - 0.5 * ixb * cos(q5) * cos(q6) * u1 * (sin(q5) * u3 - u4 - sin(q6) * cos(q5) * u2 - cos(q5) * cos(q6) * u1) - 0.5 * iyb * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1 * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1) - 0.5 * izb * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2 * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) - 0.5 * ma * (2 * lao * pzp * cos(q1) * cos(q2) * u2 + 2 * lao * pxp * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) * u2 + 2 * lao * pxp * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)) * u3 - pxp^2 - pyp^2 - pzp^2 - lao^2 * u2^2 - lao^2 * u3^2 - 2 * lao * pzp * sin(q1) * cos(q2) * u3 - 2 * lao * pyp * (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)) * u3 - 2 * lao * pyp * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) * u2)
@@ -113,7 +114,7 @@ function potentialenergy(sol, t)
     la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
     q1, q2, q3, q4, q5, q6 = sol(t)
 
-    pz = evaluate(sol.prob.p.fz, t)
+    pz = evaluate(fz, t)
 
     # space123
     # return -g * ((ma + mb) * (lao + lbo + pz) - (la * mb + lao * ma) * sin(q2) - lbo * mb * (sin(q2) * cos(q5) * cos(q6) + sin(q5) * cos(q1) * cos(q2) - sin(q1) * sin(q6) * cos(q2) * cos(q5)))
@@ -140,9 +141,9 @@ function angmom(sol, t)
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
 
     # pxp, pyp, pzp = sol.prob.p.fp(t)
-    pxp = derivative(sol.prob.p.fx, t, 1)
-    pyp = derivative(sol.prob.p.fy, t, 1)
-    pzp = derivative(sol.prob.p.fz, t, 1)
+    pxp = derivative(fx, t, 1)
+    pyp = derivative(fy, t, 1)
+    pzp = derivative(fz, t, 1)
 
     # space123
     # amomx = lao * ma * (pyp * sin(q2) + pzp * sin(q3) * cos(q2)) + mb * (la * pyp * sin(q2) + la * pzp * sin(q3) * cos(q2) + lbo * pyp * (sin(q2) * cos(q5) * cos(q6) + sin(q5) * cos(q1) * cos(q2) - sin(q1) * sin(q6) * cos(q2) * cos(q5)) + lbo * pzp * (sin(q3) * cos(q2) * cos(q5) * cos(q6) + sin(q5) * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) + sin(q6) * cos(q5) * (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)))) + cos(q2) * cos(q3) * (ixa * u1 + la * lbo * mb * (sin(q5) * u3 - sin(q6) * cos(q5) * u2)) + (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) * (iza + ma * lao^2 + la * mb * (la + lbo * cos(q5) * cos(q6))) * u3 + (cos(q2) * cos(q3) * cos(q5) * cos(q6) - sin(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) - sin(q6) * cos(q5) * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3))) * (ixb * u4 + ixb * sin(q6) * cos(q5) * u2 + ixb * cos(q5) * cos(q6) * u1 - ixb * sin(q5) * u3 - la * lbo * mb * ((sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2) - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1))) - (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)) * (iya + ma * lao^2 + la * mb * (la + lbo * cos(q5) * cos(q6))) * u2 - (cos(q2) * cos(q3) * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) + cos(q4) * cos(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) + (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)) * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4))) * (izb * (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2 - izb * u6 - izb * cos(q4) * cos(q5) * u3 - izb * (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - lbo * mb * (lbo + la * cos(q5) * cos(q6)) * (u6 + cos(q4) * cos(q5) * u3 + (sin(q4) * sin(q6) + sin(q5) * cos(q4) * cos(q6)) * u1 - (sin(q4) * cos(q6) - sin(q5) * sin(q6) * cos(q4)) * u2)) - (sin(q4) * cos(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) - cos(q2) * cos(q3) * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) - (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3))) * (iyb * (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1 - iyb * u5 - iyb * sin(q4) * cos(q5) * u3 - iyb * (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - lbo * mb * (lbo + la * cos(q5) * cos(q6)) * (u5 + sin(q4) * cos(q5) * u3 + (cos(q4) * cos(q6) + sin(q4) * sin(q5) * sin(q6)) * u2 - (sin(q6) * cos(q4) - sin(q4) * sin(q5) * cos(q6)) * u1))

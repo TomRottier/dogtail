@@ -1,4 +1,3 @@
-using Dierckx, MAT
 # Extract data from .mat files and fit quintic spline to base position
 # Returns splines for each direction as function of time and position data for base, midpoint and tip of tail
 function getdata(fname)
