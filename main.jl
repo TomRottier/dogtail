@@ -35,7 +35,7 @@ Threads.@threads for (i,fname) in collect(enumerate(fnames))
     # Find optimal parameters
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
     bounds = [(0, 50), (0, 50), (0, 50), (0, 50), (0, 2), (0, 2)]
-    res = bboptimize(x->cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=6, MaxFuncEvals=1000)
+    res = bboptimize(x->cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=6, MaxFuncEvals=10000)
     opt = best_candidate(res)
     score = best_fitness(res)
 
