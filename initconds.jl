@@ -1,5 +1,5 @@
 # Calculates initial conditions; numerically solves inverse kinematics
-using NLsolve, Optim
+using NLsolve
 
 function getinitcond(initconds, p)
 

@@ -22,15 +22,18 @@ function p3(sol, t; retp2=false)
 
     p2x, p2y, p2z = p2(sol, t)
 
+    s1 = sin(q1); s2 = sin(q2); s3 = sin(q3); s4 = sin(q4); s5 = sin(q5); s6 = sin(q6)
+    c1 = cos(q1); c2 = cos(q2); c3 = cos(q3); c4 = cos(q4); c5 = cos(q5); c6 = cos(q6)
+
     # body123
     # p3x = p2x + lb * (cos(q2) * cos(q3) * cos(q5) * cos(q6) - sin(q5) * (sin(q1) * sin(q3) + sin(q2) * cos(q1) * cos(q3)) - sin(q6) * cos(q5) * (sin(q3) * cos(q1) - sin(q1) * sin(q2) * cos(q3)))
     # p3y = p2y + lb * (sin(q3) * cos(q2) * cos(q5) * cos(q6) + sin(q5) * (sin(q1) * cos(q3) - sin(q2) * sin(q3) * cos(q1)) + sin(q6) * cos(q5) * (cos(q1) * cos(q3) + sin(q1) * sin(q2) * sin(q3)))
     # p3z = p2z - lb * (sin(q2) * cos(q5) * cos(q6) + sin(q5) * cos(q1) * cos(q2) - sin(q1) * sin(q6) * cos(q2) * cos(q5))
 
     # body123
-    p3x = p2x + lb * (cos(q2) * cos(q3) * cos(q5) * cos(q6) + sin(q2) * (sin(q4) * sin(q6) - sin(q5) * cos(q4) * cos(q6)) - sin(q3) * cos(q2) * (sin(q6) * cos(q4) + sin(q4) * sin(q5) * cos(q6)))
-    p3y = p2y - lb * (sin(q1) * cos(q2) * (sin(q4) * sin(q6) - sin(q5) * cos(q4) * cos(q6)) - cos(q5) * cos(q6) * (sin(q3) * cos(q1) + sin(q1) * sin(q2) * cos(q3)) - (sin(q6) * cos(q4) + sin(q4) * sin(q5) * cos(q6)) * (cos(q1) * cos(q3) - sin(q1) * sin(q2) * sin(q3)))
-    p3z = p2z + lb * (cos(q1) * cos(q2) * (sin(q4) * sin(q6) - sin(q5) * cos(q4) * cos(q6)) + cos(q5) * cos(q6) * (sin(q1) * sin(q3) - sin(q2) * cos(q1) * cos(q3)) + (sin(q1) * cos(q3) + sin(q2) * sin(q3) * cos(q1)) * (sin(q6) * cos(q4) + sin(q4) * sin(q5) * cos(q6)))
+    p3x = p2x + lb * (c2 * c3 * c5 * c6 + s2 * (s4 * s6 - s5 * c4 * c6) - s3 * c2 * (s6 * c4 + s4 * s5 * c6))
+    p3y = p2y - lb * (s1 * c2 * (s4 * s6 - s5 * c4 * c6) - c5 * c6 * (s3 * c1 + s1 * s2 * c3) - (s6 * c4 + s4 * s5 * c6) * (c1 * c3 - s1 * s2 * s3))
+    p3z = p2z + lb * (c1 * c2 * (s4 * s6 - s5 * c4 * c6) + c5 * c6 * (s1 * s3 - s2 * c1 * c3) + (s1 * c3 + s2 * s3 * c1) * (s6 * c4 + s4 * s5 * c6))
     
     retp2 ? (return p2x, p2y, p2z, p3x, p3y, p3z) : (return p3x, p3y, p3z)
 end

@@ -1,6 +1,6 @@
 function eom!(du, u, p, t)
-    la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
-    q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = u
+    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
+    @inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = u
 
     pxpp = derivative(p.fx, t, 2)
     pypp = derivative(p.fy, t, 2)
@@ -77,8 +77,7 @@ function eom!(du, u, p, t)
     du[11] = u5p
     du[12] = u6p
 
-
-    return du
+    return nothing
 end
 
 
