@@ -1,11 +1,10 @@
-# Calculates initial conditions; numerically solves inverse kinematics
-using NLsolve
-
+# Calculates initial generalised coordinates and speeds; numerically solves inverse kinematics
 function getinitcond(initconds, p)
 
     @inbounds px, py, pz, pxp, pyp, pzp, p2x, p2y, p2z, vp2x, vp2y, vp2z, p3x, p3y, p3z, vp3x, vp3y, vp3z = initconds
     @inbounds la, lb = p
     
+    # Solve via inverse kinematics
     function f!(F, x)
         q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = x
         
@@ -24,19 +23,9 @@ function getinitcond(initconds, p)
         F[12] = pzp + la * (sin(q1) * cos(q3) + sin(q2) * sin(q3) * cos(q1)) * u3 + lb * (cos(q1) * cos(q2) * cos(q4) * cos(q5) + sin(q5) * (sin(q1) * sin(q3) - sin(q2) * cos(q1) * cos(q3)) - sin(q4) * cos(q5) * (sin(q1) * cos(q3) + sin(q2) * sin(q3) * cos(q1))) * (sin(q6) * cos(q5) * u1 - u5 - (sin(q4) * cos(q6) + sin(q5) * sin(q6) * cos(q4)) * u3 - (cos(q4) * cos(q6) - sin(q4) * sin(q5) * sin(q6)) * u2) + lb * (sin(q6) * cos(q5) * (sin(q1) * sin(q3) - sin(q2) * cos(q1) * cos(q3)) - cos(q1) * cos(q2) * (sin(q4) * cos(q6) + sin(q5) * sin(q6) * cos(q4)) - (sin(q1) * cos(q3) + sin(q2) * sin(q3) * cos(q1)) * (cos(q4) * cos(q6) - sin(q4) * sin(q5) * sin(q6))) * (sin(q4) * cos(q5) * u2 - u6 - sin(q5) * u1 - cos(q4) * cos(q5) * u3) - la * cos(q1) * cos(q2) * u2 - vp3z
       end
 
-    # x₀ = repeat([0.], 12)
-    # options = Options(func=f!, N=12, Ns=50, Nt=200, lb=repeat([-7.], 12), ub=repeat([7.], 12), print_status=false, c=repeat([2.0], 12))
-    # result = Result(fopt=options.f(x₀), xopt=x₀)
-    # current = State(f=options.f(x₀), x=x₀, v=options.ub .- options.lb, T=100.0)
-
-    # sa!(current, result, options)
-
-
-
     sol = nlsolve(f!, repeat([rand()], 12), method=:trust_region, store_trace=true, extended_trace=true, autodiff=:forward)
-
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol.zero
-    
+        
     return [q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6]
 end
 

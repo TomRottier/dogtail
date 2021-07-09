@@ -50,6 +50,9 @@ function getdata(fname)
     initcond_tip = [tip[1,:]..., derivative(tip_splx, 0, 1), derivative(tip_sply, 0, 1), derivative(tip_splz, 0, 1)]
     initconds = [initcond_base; initcond_mid; initcond_tip]
 
+    # Orientation angles body123
+    orientations = getorientation(base, mid, tip)
+
     # Segment lengths
     la = sqrt.(sum((mid - base).^2, dims=2)) |> mean
     lb = sqrt.(sum((tip - mid).^2, dims=2))  |> mean
@@ -57,5 +60,5 @@ function getdata(fname)
     # Time span
     tspan = (0, time[end])
 
-    return splx, sply, splz, base, mid, tip, initconds, la, lb, tspan
+    return splx, sply, splz, base, mid, tip, orientations, la, lb, tspan
 end
