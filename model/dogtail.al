@@ -7,6 +7,7 @@
 %   Settings
 overwrite on
 degrees off
+autorhs off
 %--------------------------------------------------------------------
 %   Physical declarations
 newtonian n
@@ -35,12 +36,11 @@ p_p1_ao> = lao*a1>                  % From base to CoM of first seg
 p_p1_p2> = la*a1>                   % From base of first to base of second seg
 p_p2_bo> = lbo*b1>  
 p_p2_p3> = lb*b1>   
-%%--------------------------------------------------------------------
+%--------------------------------------------------------------------
 %   Motion constraints
-dependent[1] = u1
-dependent[2] = u4
-constrain(dependent[u1,u4])
---------------------------------------------------------------------
+dependent[1] = u4
+constrain(dependent[u4])
+%--------------------------------------------------------------------
 %    Angular velocity of pendulum
 w_a_n> = u1*a1> + u2*a2> + u3*a3>
 w_b_a> = u4*b1> + u5*b2> + u6*b3>
@@ -122,5 +122,5 @@ output t,ke,pe,te,amomx,amomy,amomz
 input abserr=1.0e-08, relerr=1.0e-07
 %--------------------------------------------------------------------
 %   generate code
-code nonlinear(out,u1,u2,u3,u4,u5,u6) invkin.f
+%code nonlinear(out,u1,u2,u3,u4,u5,u6) invkin.f
 code dynamics() dogtail.f, nosubs

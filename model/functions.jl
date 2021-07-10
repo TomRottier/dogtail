@@ -1,6 +1,6 @@
 ##### Location of points
 function p2(sol, t)
-    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
+    @unpack la, fx, fy, fz = sol.prob.p
     q1, q2, q3 = sol(t)
 
     # space123
@@ -17,7 +17,7 @@ function p2(sol, t)
 end
 
 function p3(sol, t; retp2=false)
-    @inbounds la, lb = sol.prob.p
+    @unpack lb = sol.prob.p
     q1, q2, q3, q4, q5, q6 = sol(t)
 
     p2x, p2y, p2z = p2(sol, t)
@@ -43,13 +43,9 @@ p3(sol; retp2=false) = [p3(sol, t, retp2=retp2) for t ∈ sol.t]
 
 ######## Plotting
 function plot_model(sol, t; tip=false)
-    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
+    @unpack fx, fy, fz, = sol.prob.p
     # px, py, pz = sol.prob.p.f(t)
-    px = fx(t)
-    py = fy(t)
-    pz = fz(t)
-
-
+    px = fx(t); py = fy(t); pz = fz(t)
     p2x, p2y, p2z, p3x, p3y, p3z = p3(sol, t, retp2=true)
 
     #  base
@@ -94,7 +90,7 @@ end
 
 ##### Energy
 function kineticenergy(sol, t)
-    la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
+    @unpack la, lao, lbo, ixa, ixb, iya, iyb, iza, izb, fx, fy, fz, ma, mb = sol.prob.p
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
 
     # pxp, pyp, pzp = sol.prob.p.fp(t)
@@ -111,7 +107,7 @@ function kineticenergy(sol, t)
 end
 
 function potentialenergy(sol, t)
-    la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
+    @unpack la, lao, lbo, g, fz, ma, mb = sol.prob.p
     q1, q2, q3, q4, q5, q6 = sol(t)
 
     pz = evaluate(fz, t)
@@ -137,7 +133,7 @@ end
 
 ##### Angular momentum about origin
 function angmom(sol, t)
-    la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
+    @unpack la, lao, lbo, ixa, ixb, iya, iyb, iza, izb, fx, fy, fz, ma, mb = sol.prob.p
     q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
 
     # pxp, pyp, pzp = sol.prob.p.fp(t)

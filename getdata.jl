@@ -1,5 +1,7 @@
 # Extract data from .mat files and fit quintic spline to base position
-# Returns splines for each direction as function of time and position data for base, midpoint and tip of tail
+# Returns splines for each direction as function of time, position data for base, midpoint and tip of tail, orientations of tail segments and average length of tails
+using Dierckx, Mat
+
 function getdata(fname)
     # Load data
     # fname = "MPIData/MPI-Advanced-Kay0040.mat";
@@ -37,21 +39,15 @@ function getdata(fname)
     splx = Spline1D(time, base[:,1], k=5) 
     sply = Spline1D(time, base[:,2], k=5) 
     splz = Spline1D(time, base[:,3], k=5)
-    mid_splx = Spline1D(time, mid[:,1], k=5) 
-    mid_sply = Spline1D(time, mid[:,2], k=5) 
-    mid_splz = Spline1D(time, mid[:,3], k=5)
-    tip_splx = Spline1D(time, tip[:,1], k=5) 
-    tip_sply = Spline1D(time, tip[:,2], k=5) 
-    tip_splz = Spline1D(time, tip[:,3], k=5)
-
-    # Initial conditions
-    initcond_base = [base[1,:]..., derivative(splx, 0, 1), derivative(sply, 0, 1), derivative(splz, 0, 1)]
-    initcond_mid = [mid[1,:]..., derivative(mid_splx, 0, 1), derivative(mid_sply, 0, 1), derivative(mid_splz, 0, 1)]
-    initcond_tip = [tip[1,:]..., derivative(tip_splx, 0, 1), derivative(tip_sply, 0, 1), derivative(tip_splz, 0, 1)]
-    initconds = [initcond_base; initcond_mid; initcond_tip]
+    # mid_splx = Spline1D(time, mid[:,1], k=5) 
+    # mid_sply = Spline1D(time, mid[:,2], k=5) 
+    # mid_splz = Spline1D(time, mid[:,3], k=5)
+    # tip_splx = Spline1D(time, tip[:,1], k=5) 
+    # tip_sply = Spline1D(time, tip[:,2], k=5) 
+    # tip_splz = Spline1D(time, tip[:,3], k=5)
 
     # Orientation angles body123
-    orientations = getorientation(base, mid, tip)
+    orientations = getorientation(time, base, mid, tip)
 
     # Segment lengths
     la = sqrt.(sum((mid - base).^2, dims=2)) |> mean

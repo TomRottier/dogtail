@@ -85,18 +85,20 @@ p2x = dot(p_o_p2>, n1>)
 p2y = dot(p_o_p2>, n2>)
 p2z = dot(p_O_p2>, n3>)
 %--------------------------------------------------------------------
-%   Set up system of non-linear equations to solve for Q's and U's
+%   Set up system of non-linear equations to solve for U's
 vp2x = dot( dt(p_o_p2>, n), n1>)
 vp2y = dot( dt(p_o_p2>, n), n2>)
 vp2z = dot( dt(p_o_p2>, n), n3>)
 
-out[1] = vp2x - rhs(vp2x)
-out[2] = vp2y - rhs(vp2y)
+out1[1] = vp2x - rhs(vp2x)
+out1[2] = vp2y - rhs(vp2y)
 out2[1] = vp2y - rhs(vp2y)
 out2[2] = vp2z - rhs(vp2z)
+out3[1] = vp2x - rhs(vp2x)
+out3[2] = vp2z - rhs(vp2z)
 
-%evaluate(u5,u1=0,u2=0,u3=0,q5=1,q6=1,la=1,vp2x=1,vp2y=2,vp2z=0)
-%evaluate(u6,u1=0,u2=0,u3=0,q5=1,q6=1,la=1,vp2x=1,vp2y=2,vp2z=0)
+evaluate(u5,u1=0,u2=0,u3=0,q5=1,q6=1,la=1,vp2x=1,vp2y=2,vp2z=0)
+evaluate(u6,u1=0,u2=0,u3=0,q5=1,q6=1,la=1,vp2x=1,vp2y=2,vp2z=0)
 %--------------------------------------------------------------------
 %   Outputs
 output t,p1x,p1y,p1z,p2x,p2y,p2z

@@ -1,5 +1,8 @@
-# Calculates initial generalised coordinates and speeds
-function getorientation(base, mid, tip)
+# Calculates orientaion angles, derivatives and generalised speeds
+# Body123
+using Rotations
+
+function getorientation(time, base, mid, tip)
     # Set up vectors
     v1 = normalize(mid - base, 2); v2 = normalize(tip - mid, 2)
 

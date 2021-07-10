@@ -1,13 +1,17 @@
+# Initialise global arrays for eom! to update
+const coef = MMatrix{6,6,Float64}(undef)
+const rhs = MVector{6,Float64}(undef)
+
 function eom!(du, u, p, t)
-    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
+    @unpack la, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = p
     @inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = u
 
     pxpp = derivative(fx, t, 2)
     pypp = derivative(fy, t, 2)
     pzpp = derivative(fz, t, 2)
     
-    coef = Matrix{Float64}(undef, 6, 6)
-    rhs = Vector{Float64}(undef, 6)
+    # coef = MMatrix{6,6,Float64}(undef)
+    # rhs = MVector{6,Float64}(undef)
 
     s1 = sin(q1); s2 = sin(q2); s3 = sin(q3); s4 = sin(q4); s5 = sin(q5); s6 = sin(q6)
     c1 = cos(q1); c2 = cos(q2); c3 = cos(q3); c4 = cos(q4); c5 = cos(q5); c6 = cos(q6)
