@@ -1,4 +1,5 @@
-using Plots, OrdinaryDiffEq, StaticArrays, BlackBoxOptim, Dierckx, MAT, NLsolve, Rotations, Parameters
+using StaticArrays:eachindex
+using Plots, OrdinaryDiffEq, StaticArrays, BlackBoxOptim, Parameters
 using DelimitedFiles, Statistics, LinearAlgebra
 
 include("getdata.jl")
@@ -29,9 +30,9 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
 
     # Find optimal parameters
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
-    bounds = [(0.05, 0.3), (0.05, 0.3), (0.05, 0.3), (0.05, 0.3), (0.0001, 0.01), (0.0001, 0.01)]
+    bounds = [(0.1, 0.5), (0.1, 0.5), (0.0001, 0.01), (0.0001, 0.01), (0.0001, 0.01), (0.0001, 0.01), (-π / 2, π / 2), (-π / 2, π / 2), (-π / 2, π / 2)]
 
-    res = bboptimize(x -> cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=6, MaxFuncEvals=10)
+    res = bboptimize(x -> cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=6, MaxFuncEvals=10000)
     opt = best_candidate(res)
     score = best_fitness(res)
 
@@ -39,16 +40,16 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     mid_sim, tip_sim = cost(opt, p, u₀, tspan, times)
 
     # Save to file
-    # name = split(fname, "-") |> x -> split(x[3], ".mat")[1]
-    # names[i] = name
-    # open("results.csv", "a") do io
-    #     writedlm(io, [name  opt... score], ',')
-    # end
+    name = split(fname, "-") |> x -> split(x[3], ".mat")[1]
+    names[i] = name
+    open("results.csv", "a") do io
+        writedlm(io, [name  opt... score], ',')
+    end
 
 end
 
 # # Plot
-for i in 1:length(sols)
+for i ∈ eachindex(sols)
     sol = try
         sols[i]
     catch

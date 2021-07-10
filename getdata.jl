@@ -1,6 +1,6 @@
 # Extract data from .mat files and fit quintic spline to base position
 # Returns splines for each direction as function of time, position data for base, midpoint and tip of tail, orientations of tail segments and average length of tails
-using Dierckx, Mat
+using Dierckx, MAT
 
 function getdata(fname)
     # Load data

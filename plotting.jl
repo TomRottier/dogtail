@@ -1,4 +1,5 @@
-function animate_comparison(base, mid, tip, base_sim, mid_sim, tip_sim)
+function animate_comparison(base, mid, tip, mid_sim, tip_sim)
+    base_sim = copy(base)
     mins = minimum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1); maxs = maximum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1)
 
     anim = @animate for (index, t) ∈ enumerate(times)
