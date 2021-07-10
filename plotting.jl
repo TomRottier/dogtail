@@ -6,7 +6,7 @@ function animate_comparison(base, mid, tip, mid_sim, tip_sim)
         # Trajectory
         plot(base[:,1], base[:,2], base[:,3], label="", ls=:dash, color=:black)
         # Base
-        plot!([base[index,1]], [base[index,2]], [base[index,3]], label="", st=:scatter, color=:black)
+        plot!([base[index,1]], [base[index,2]], [base[index,3]], label="", st=:scatter, color=:blue)
         # Actual tail
         plot!([base[index,1], mid[index,1], tip[index,1]],
              [base[index,2], mid[index,2], tip[index,2]],
