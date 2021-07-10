@@ -24,7 +24,7 @@ end
 function cost(pin, p, u₀, tspan, times)
     # Remake problem with new parameters
     update_parameters!(pin, p)
-    newprob = ODEProblem{true}(eom!, u₀, tspan, pnew)
+    newprob = ODEProblem{true}(eom!, u₀, tspan, p)
     
     # Solve
     sol = solve(newprob, Tsit5(), abstol=1e-7, reltol=1e-7, saveat=times)
