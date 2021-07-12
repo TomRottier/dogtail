@@ -6,7 +6,7 @@ function cost(pin, p, u₀, tspan, times, mid, tip)
     
     # Solve
     sol = solve(newprob, Tsit5(), abstol=1e-7, reltol=1e-7, saveat=times)
-    sol.retcode == :MaxIters && (println(pin); return 1.0)
+    sol.retcode == :MaxIters && return 1.0
 
     # Compare simulation output to measured data
     mid_sim::Matrix{Float64} = [tup[i] for tup ∈ p2(sol), i ∈ 1:3]

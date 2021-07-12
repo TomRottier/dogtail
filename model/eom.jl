@@ -1,6 +1,6 @@
-# Initialise global arrays for eom! to update
-const coef = MMatrix{6,6,Float64}(undef)
-const rhs = MVector{6,Float64}(undef)
+# Initialise global arrays for eom! to update - doesn't work with @threads (shared memory)
+# const coef = MMatrix{6,6,Float64}(undef)
+# const rhs = MVector{6,Float64}(undef)
 
 function eom!(du, u, p, t)
     @unpack la, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb, eqX, eqY, eqZ = p
@@ -10,8 +10,8 @@ function eom!(du, u, p, t)
     pypp = derivative(fy, t, 2)
     pzpp = derivative(fz, t, 2)
     
-    # coef = MMatrix{6,6,Float64}(undef)
-    # rhs = MVector{6,Float64}(undef)
+    coef = MMatrix{6,6,Float64}(undef)
+    rhs = MVector{6,Float64}(undef)
 
     s1 = sin(q1); s2 = sin(q2); s3 = sin(q3); s4 = sin(q4); s5 = sin(q5); s6 = sin(q6)
     c1 = cos(q1); c2 = cos(q2); c3 = cos(q3); c4 = cos(q4); c5 = cos(q5); c6 = cos(q6)

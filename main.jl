@@ -1,4 +1,3 @@
-using StaticArrays:eachindex
 using Plots, OrdinaryDiffEq, StaticArrays, BlackBoxOptim, Parameters
 using DelimitedFiles, Statistics, LinearAlgebra
 
@@ -20,6 +19,7 @@ names = similar(sols)
 Threads.@threads for (i, fname) in collect(enumerate(fnames))
     # Get data for trial
     # fname = "MPIData/MPI-Advanced-Ethan0030.mat"
+    println(i)
     splx, sply, splz, base, mid, tip, orientations, la, lb, tspan = getdata("MPIData/" * fname)
     data[i] = cat(base, mid, tip, dims=3)
 
@@ -32,7 +32,7 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
     bounds = [(0.1, 0.5), (0.1, 0.5), (0.0001, 0.01), (0.0001, 0.01), (0.0001, 0.01), (0.0001, 0.01), (-π / 2, π / 2), (-π / 2, π / 2), (-π / 2, π / 2)]
 
-    res = bboptimize(x -> cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=6, MaxFuncEvals=10000)
+    res = bboptimize(x -> cost(x, p, u₀, tspan, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=10000)
     opt = best_candidate(res)
     score = best_fitness(res)
 

@@ -9,13 +9,14 @@ function getdata(fname)
 
     # Get tail marker data
     markers = data["Trajectories"]["Labeled"]
-    mdata = markers["Data"] |> x -> permutedims(x, [3,2,1])
+    mdata = markers["Data"] |> x -> permutedims(x, [3,2,1]) 
     base_marker = "SchwAns"; mid_marker = "Schw"; tip_marker = "SchwSpi"
     mnames = markers["Labels"] |> vec
 
-    base = mdata[:, 1:3, base_marker .== mnames][:,:,1] ./ 1000 # Get in m
-    mid  = mdata[:, 1:3, mid_marker .== mnames][:,:,1]  ./ 1000 
-    tip  = mdata[:, 1:3, tip_marker .== mnames][:,:,1]  ./ 1000 
+    # Ge individual marker data in m
+    base = mdata[:, 1:3, base_marker .== mnames][:,:,1] ./ 1000
+    mid  = mdata[:, 1:3, mid_marker .== mnames][:,:,1]  ./ 1000
+    tip  = mdata[:, 1:3, tip_marker .== mnames][:,:,1]  ./ 1000
 
     # Plot to check
     # anim = @animate for t ∈ 1:size(base, 1)
@@ -33,23 +34,35 @@ function getdata(fname)
     # gif(anim, "recorded.gif")
 
 
-    # Fit quintic spline to data
-    hz = data["FrameRate"]; n = data["Frames"]
-    time = range(0, step=1 / hz, length=Int(n))
-    splx = Spline1D(time, base[:,1], k=5) 
-    sply = Spline1D(time, base[:,2], k=5) 
+    # Fit quintic spline to data then evaluate across common time to remove and NaN's
+    hz = data["FrameRate"]; n = size(mdata, 1)
+    time = range(0, step=1 / hz, length=n)
+    dirty = [base, mid, tip]
+    clean = Vector(undef, 3)
+    for i ∈ 1:3
+        data = dirty[i] |> x -> x[ .!isnan.(x) ] |> x -> reshape(x, :, 3)
+        n = size(data, 1)
+        time_dirty = range(0, step=1/hz, length=n)
+        splx = Spline1D(time_dirty, data[:,1], k=5)
+        sply = Spline1D(time_dirty, data[:,2], k=5)
+        splz = Spline1D(time_dirty, data[:,3], k=5)
+
+        data_cleaned = [evaluate(splx, time) evaluate(sply, time) evaluate(splz, time)]
+        clean[i] = data_cleaned
+    end
+
+    base, mid, tip = clean
+
+    # Output splines
+    splx = Spline1D(time, base[:,1], k=5)
+    sply = Spline1D(time, base[:,2], k=5)
     splz = Spline1D(time, base[:,3], k=5)
-    # mid_splx = Spline1D(time, mid[:,1], k=5) 
-    # mid_sply = Spline1D(time, mid[:,2], k=5) 
-    # mid_splz = Spline1D(time, mid[:,3], k=5)
-    # tip_splx = Spline1D(time, tip[:,1], k=5) 
-    # tip_sply = Spline1D(time, tip[:,2], k=5) 
-    # tip_splz = Spline1D(time, tip[:,3], k=5)
+
 
     # Orientation angles body123
     orientations = getorientation(time, base, mid, tip)
 
-    # Segment lengths
+    # Segment lengths; removing NaN's
     la = sqrt.(sum((mid - base).^2, dims=2)) |> mean
     lb = sqrt.(sum((tip - mid).^2, dims=2))  |> mean
 
