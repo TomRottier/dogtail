@@ -1,9 +1,10 @@
 # Cost function to optimise
-function cost(pin, p, u₀, tspan, times, mid, tip)
+function cost(pin, p, prob, times, mid, tip)
     # Remake problem with new parameters
     update_parameters!(pin, p)
-    newprob = ODEProblem{true}(eom!, u₀, tspan, p)
-    
+    # newprob = ODEProblem{true}(eom!, u₀, tspan, p)
+    newprob = remake(prob; p=p)
+
     # Solve
     sol = solve(newprob, Tsit5(), abstol=1e-7, reltol=1e-7, saveat=times)
     sol.retcode == :MaxIters && return 1.0
@@ -18,7 +19,6 @@ function cost(pin, p, u₀, tspan, times, mid, tip)
 
     return (mid_rmse + tip_rmse) * 0.5
 end
-
 
 # Returns simulated values
 function cost(pin, p, u₀, tspan, times)
