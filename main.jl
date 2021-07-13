@@ -10,7 +10,7 @@ include("cost.jl")
 include("model/functions.jl")
 include("plotting.jl")
 
-fnames = readdir("MPIData/")
+fnames = readdir("Data/")
 sols = Vector(undef, length(fnames))
 data = similar(sols)
 plts = similar(sols)
@@ -18,43 +18,34 @@ names = similar(sols)
 
 #= Threads.@threads =# for (i, fname) in collect(enumerate(fnames))
     # Get data for trial
-    # fname = "MPIData/MPI-Advanced-Ethan0030.mat"
     println(i)
-    splx, sply, splz, base, mid, tip, orientations, la, lb, tspan = getdata("MPIData/" * fname)
-    # data[i] = cat(base, mid, tip, dims=3)
-    # times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
-
-    # plt = plot(derivative(splx, times, 2))
-    # plot!(derivative(sply, times, 2))
-    # plot!(derivative(splz, times, 2), label=["x" "y" "z"], title="$i")
-    # display(plt)
-
-    # plt2 = plot(evaluate(splx, times), evaluate(splx, times), evaluate(splx, times), label="", title="$i")
-    # display(plt2)
+    splx, sply, splz, time, base, mid, tip, orientations, la, lb, tspan = getdata("Data/" * fname)
 
     # Create model
     p = initialise_parameters(splx, sply, splz, la, lb)
-    u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
-    prob = ODEProblem(eom!, u₀, tspan, p)
+    u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
+    u₀_SA = @SVector [orientations[i][1] for i ∈ eachindex(orientations)]
+    # prob = ODEProblem(eom!, u₀, tspan, p)
+    prob = ODEProblem(eom_SA, u₀_SA, tspan, p)
 
     # Find optimal parameters
 
     # Using BlackBoxOptim
-    # bounds = [(0.05, 0.5), (0.05, 0.5), (0.0001, 0.005), (0.0001, 0.005), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
-    # res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=10)
-    # opt = best_candidate(res)
-    # score = best_fitness(res)
+    bounds = [(0.05, 0.5), (0.05, 0.5), (0.0001, 0.005), (0.0001, 0.005), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
+    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=10)
+    opt = best_candidate(res)
+    score = best_fitness(res)
 
     # Using Evolutionary.jl
     lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
     ub = [0.5, 0.5, 0.005, 0.005, 0.0002, 0.0002, π, π, π]
     x₀ = @. lb + (ub - lb) / 2
-    ga = GA(populationSize=100, selection=uniformranking(3), mutation=gaussian(), crossover=uniformbin())
+    ga = GA(populationSize=100)
     opts = Evolutionary.Options(show_trace=true)
     res = Evolutionary.optimize(x -> cost(x, p, prob, time, mid, tip), lb, ub, x₀, ga, opts)
 
-    # Call cost with optimal paramters
+    # # Call cost with optimal paramters
     mid_sim, tip_sim = cost(opt, p, u₀, tspan, times)
 
     # # Save to file

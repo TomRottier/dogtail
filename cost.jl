@@ -17,7 +17,7 @@ function cost(pin, p, prob, times, mid, tip)
     mid_rmse = sqrt.((mean((mid::Matrix{Float64} - mid_sim).^2, dims=1))) |> mean
     tip_rmse = sqrt.((mean((tip::Matrix{Float64} - tip_sim).^2, dims=1))) |> mean
 
-    return (mid_rmse + tip_rmse) * 0.5
+    return 0.8 * mid_rmse + 0.2 * tip_rmse
 end
 
 # Returns simulated values
