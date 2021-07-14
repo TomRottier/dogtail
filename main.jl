@@ -11,74 +11,69 @@ include("model/functions.jl")
 include("plotting.jl")
 
 fnames = readdir("Data/")
-sols = Vector(undef, length(fnames))
-data = similar(sols)
-plts = similar(sols)
-names = similar(sols)
+mids_sim = Vector{Matrix{Float64}}(undef, length(fnames))
+tips_sim = similar(mids_sim)
+mids = similar(mids_sim)
+tips = similar(mids)
+dognames = Vector{String}(undef, length(fnames))
 
-#= Threads.@threads =# for (i, fname) in collect(enumerate(fnames))
+Threads.@threads for (i, fname) in collect(enumerate(fnames))
     # Get data for trial
     println(i)
     splx, sply, splz, time, base, mid, tip, orientations, la, lb, tspan = getdata("Data/" * fname)
-
+    mids[i] = mid; tips[i] = tip
+    dognames[i] = split(fname, ".")[1]
+    
     # Create model
     p = initialise_parameters(splx, sply, splz, la, lb)
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
-    u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
-    u₀_SA = @SVector [orientations[i][1] for i ∈ eachindex(orientations)]
+    # u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
     # prob = ODEProblem(eom!, u₀, tspan, p)
+    u₀_SA =SVector{12, Float64}([orientations[j][1] for j ∈ eachindex(orientations)])
     prob = ODEProblem(eom_SA, u₀_SA, tspan, p)
 
     # Find optimal parameters
 
     # Using BlackBoxOptim
-    bounds = [(0.05, 0.5), (0.05, 0.5), (0.0001, 0.005), (0.0001, 0.005), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
-    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=10)
+    bounds = [(0.05, 0.6), (0.05, 0.6), (0.0001, 0.002), (0.0002, 0.001), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
+    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=5_000, ftol=1e-4)
     opt = best_candidate(res)
     score = best_fitness(res)
 
     # Using Evolutionary.jl
-    lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
-    ub = [0.5, 0.5, 0.005, 0.005, 0.0002, 0.0002, π, π, π]
-    x₀ = @. lb + (ub - lb) / 2
-    ga = GA(populationSize=100)
-    opts = Evolutionary.Options(show_trace=true)
-    res = Evolutionary.optimize(x -> cost(x, p, prob, time, mid, tip), lb, ub, x₀, ga, opts)
+    # lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
+    # ub = [0.5, 0.5, 0.005, 0.005, 0.0002, 0.0002, π, π, π]
+    # x₀ = @. lb + (ub - lb) / 2
+    # ga = GA(populationSize=100)
+    # opts = Evolutionary.Options(show_trace=true)
+    # res = Evolutionary.optimize(x -> cost(x, p, prob, time, mid, tip), lb, ub, x₀, ga, opts)
 
-    # # Call cost with optimal paramters
-    mid_sim, tip_sim = cost(opt, p, u₀, tspan, times)
+    # Call cost with optimal paramters
+    # mid_sim, tip_sim = cost(opt, p, u₀, tspan, times)
+    mid_sim, tip_sim = cost(opt, p, prob, times)
+    mids_sim[i] = mid_sim; tips_sim[i] = tip_sim
 
-    # # Save to file
-    # name = split(fname, "-") |> x -> split(x[3], ".mat")[1]
-    # names[i] = name
-    # open("results.csv", "a") do io
-    #     writedlm(io, [name  opt... score], ',')
-    # end
+    # Save to file
+    name = split(fname, ".")[1]
+    open("results.csv", "a") do io
+        writedlm(io, [name  opt... score], ',')
+    end
+    open("SimData/"*name*".csv", "w") do io
+        header = ["time" "midX" "midY" "midZ" "tipX" "tipY" "tipZ"]
+        writedlm(io, [ header; times mid tip], ',')
+    end
 
 end
 
 # # Plot
-for i ∈ eachindex(sols)
-    sol = try
-        sols[i]
-    catch
-        continue
-    end
+for i ∈ eachindex(mids)
+    mid = mids[i]
+    tip = tips[i]
+    mid_sim = mids_sim[i]
+    tip_sim = tips_sim[i]
 
-    @inbounds la, lb, lao, lbo, ixa, ixb, iya, iyb, iza, izb, g, fx, fy, fz, ka, kb, ba, bb, ma, mb = sol.prob.p
-    tspan = sol.prob.tspan
-
-    base = data[i][:,:,1]
-    mid = data[i][:,:,2]
-    tip = data[i][:,:,3]
-
-    times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
-    base_sim = [fx(times) fy(times) fz(times)]
-    mid_sim = [tup[j] for tup ∈ [p2(sol, t) for t ∈ times], j ∈ 1:3]
-    tip_sim = [tup[j] for tup ∈ [p3(sol, t) for t ∈ times], j ∈ 1:3]
-
-
+    title = plot(title=dognames[i], grid = false, showaxis = false, ticks=false,bottom_margin = -50Plots.px)
     plt = plot_comparison(mid, tip, mid_sim, tip_sim)
-    plot!(title=names[i])
-    display(plt)
+    bigplt = plot(title, plt, layout = @layout([A{0.15h}; B]))
+    display(bigplt)
 end
