@@ -36,7 +36,7 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
 
     # Using BlackBoxOptim
     bounds = [(0.05, 0.6), (0.05, 0.6), (0.0001, 0.002), (0.0002, 0.001), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
-    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=5_000, ftol=1e-4)
+    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=5000, ftol=1e-4)
     opt = best_candidate(res)
     score = best_fitness(res)
 
@@ -49,7 +49,6 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     # res = Evolutionary.optimize(x -> cost(x, p, prob, time, mid, tip), lb, ub, x₀, ga, opts)
 
     # Call cost with optimal paramters
-    # mid_sim, tip_sim = cost(opt, p, u₀, tspan, times)
     mid_sim, tip_sim = cost(opt, p, prob, times)
     mids_sim[i] = mid_sim; tips_sim[i] = tip_sim
 
@@ -65,7 +64,7 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
 
 end
 
-# # Plot
+# Plot
 for i ∈ eachindex(mids)
     mid = mids[i]
     tip = tips[i]
