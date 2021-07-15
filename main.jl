@@ -1,3 +1,4 @@
+using StaticArrays:eachindex
 using Plots, OrdinaryDiffEq, StaticArrays, BlackBoxOptim, Parameters, Evolutionary
 using DelimitedFiles, Statistics, LinearAlgebra
 
@@ -29,14 +30,14 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
     # u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
     # prob = ODEProblem(eom!, u₀, tspan, p)
-    u₀_SA =SVector{12, Float64}([orientations[j][1] for j ∈ eachindex(orientations)])
+    u₀_SA = SVector{12,Float64}([orientations[j][1] for j ∈ eachindex(orientations)])
     prob = ODEProblem(eom_SA, u₀_SA, tspan, p)
 
     # Find optimal parameters
 
     # Using BlackBoxOptim
     bounds = [(0.05, 0.6), (0.05, 0.6), (0.0001, 0.002), (0.0002, 0.001), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
-    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=5000, ftol=1e-4)
+    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=1000, ftol=1e-4)
     opt = best_candidate(res)
     score = best_fitness(res)
 
@@ -57,9 +58,9 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     open("results.csv", "a") do io
         writedlm(io, [name  opt... score], ',')
     end
-    open("SimData/"*name*".csv", "w") do io
+    open("SimData/" * name * ".csv", "w") do io
         header = ["time" "midX" "midY" "midZ" "tipX" "tipY" "tipZ"]
-        writedlm(io, [ header; times mid tip], ',')
+        writedlm(io, [ header; times mid_sim tip_sim], ',')
     end
 
 end
@@ -71,8 +72,28 @@ for i ∈ eachindex(mids)
     mid_sim = mids_sim[i]
     tip_sim = tips_sim[i]
 
-    title = plot(title=dognames[i], grid = false, showaxis = false, ticks=false,bottom_margin = -50Plots.px)
+    title = plot(title=dognames[i], grid=false, showaxis=false, ticks=false, bottom_margin=-50Plots.px)
     plt = plot_comparison(mid, tip, mid_sim, tip_sim)
-    bigplt = plot(title, plt, layout = @layout([A{0.15h}; B]))
+    bigplt = plot(title, plt, layout=@layout([A{0.15h}; B]))
     display(bigplt)
+end
+
+
+results = readdlm("results.csv", ',', skipstart=13)
+
+for result ∈ eachrow(results)
+    name = result[1] * ".csv"
+    opt = result[2:end]
+    splx, sply, splz, time, base, mid, tip, orientations, la, lb, tspan = getdata("Data/" * name)
+
+    p = initialise_parameters(splx, sply, splz, la, lb)
+    times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
+    u₀_SA = SVector{12,Float64}([orientations[j][1] for j ∈ eachindex(orientations)])
+    prob = ODEProblem(eom_SA, u₀_SA, tspan, p)
+    mid_sim, tip_sim = cost(opt, p, prob, times)
+
+    open("SimData/" * name, "w") do io
+        header = ["time" "midX" "midY" "midZ" "tipX" "tipY" "tipZ"]
+        writedlm(io, [ header; times mid_sim tip_sim], ',')
+    end
 end

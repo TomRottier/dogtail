@@ -2,26 +2,27 @@ function animate_comparison(base, mid, tip, mid_sim, tip_sim)
     base_sim = copy(base)
     mins = minimum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1); maxs = maximum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1)
 
-    anim = @animate for (index, t) ∈ enumerate(times)
+    anim = @animate for idx ∈ 1:size(base, 1)
         # Trajectory
         plot(base[:,1], base[:,2], base[:,3], label="", ls=:dash, color=:black)
         # Base
-        plot!([base[index,1]], [base[index,2]], [base[index,3]], label="", st=:scatter, color=:blue)
+        plot!([base[idx,1]], [base[idx,2]], [base[idx,3]], label="", st=:scatter, color=:blue)
         # Actual tail
-        plot!([base[index,1], mid[index,1], tip[index,1]],
-             [base[index,2], mid[index,2], tip[index,2]],
-             [base[index,3], mid[index,3], tip[index,3]],
+        plot!([base[idx,1], mid[idx,1], tip[idx,1]],
+             [base[idx,2], mid[idx,2], tip[idx,2]],
+             [base[idx,3], mid[idx,3], tip[idx,3]],
              color=:black, lw=:2, label="")
         # Simulated tail
-        plot!([base_sim[index,1], mid_sim[index,1], tip_sim[index,1]],
-             [base_sim[index,2], mid_sim[index,2], tip_sim[index,2]],
-             [base_sim[index,3], mid_sim[index,3], tip_sim[index,3]],
+        plot!([base_sim[idx,1], mid_sim[idx,1], tip_sim[idx,1]],
+             [base_sim[idx,2], mid_sim[idx,2], tip_sim[idx,2]],
+             [base_sim[idx,3], mid_sim[idx,3], tip_sim[idx,3]],
              color=:red, lw=:2, label="")
         # Axis limits
-        xlims!(mins[1], maxs[1])
-        ylims!(mins[2], maxs[2])
-        zlims!(mins[3], maxs[3])
         plot!(aspect_ratio=:equal)
+        # xlims!(mins[1], maxs[1])
+        # ylims!(mins[2], maxs[2])
+        # zlims!(mins[3], maxs[3])
+        xlims!(-0.2, 2.0); ylims!(-0.2, 2.0); zlims!(0.0, 2.2)
         # Camera angle
         # plot!(camera=(90,60))
     end
