@@ -41,52 +41,6 @@ end
 p2(sol) = [p2(sol, t) for t ∈ sol.t]
 p3(sol; retp2=false) = [p3(sol, t, retp2=retp2) for t ∈ sol.t]
 
-######## Plotting
-function plot_model(sol, t; tip=false)
-    @unpack fx, fy, fz, = sol.prob.p
-    # px, py, pz = sol.prob.p.f(t)
-    px = fx(t); py = fy(t); pz = fz(t)
-    p2x, p2y, p2z, p3x, p3y, p3z = p3(sol, t, retp2=true)
-
-    #  base
-    plot([px], [py], [pz], st=:scatter, color=:black, label="")
-    # central axes
-    plot!([-2,2], [0,0], [0,0], label="", color=:gray, lw=.5)
-    plot!([0,0], [-2,2], [0,0], label="", color=:gray, lw=.5)
-    plot!([0,0], [0,0], [-2,2], label="", color=:gray, lw=.5)
-
-    # pendulum
-    plot!([px, p2x, p3x], [py, p2y, p3y], [pz, p2z, p3z], 
-        label="", color=:black, lw=2)# , camera=(0, 30))
-
-    # lines to pendulum tip
-    if tip
-        plot!([p3x, p3x],[p3y, p3y], [p3z, -2.0], 
-              label="", color=:black, ls=:dash)
-        plot!([0, p3x], [0, 0], [-1, -1], 
-            label="", color=:black, ls=:dash)
-        plot!([p3x, p3x], [0, p3y], [-1,-1], 
-            label="", color=:black, ls=:dash)
-    end
-
-    xlabel!("x"); ylabel!("y"); # zlabel!("z)")
-    xlims!(-3, 3)
-    ylims!(-3, 3)
-    zlims!(-3, 3)
-    plot!(aspect_ratio=:equal)
-
-end
-
-function animate_model(sol; fps=24)
-    traj = [tup[k] for tup ∈ p3(sol), k ∈ 1:3]
-    anim = @animate for t ∈ range(sol.t[begin], sol.t[end], step=1 / fps)
-        plot_model(sol, t)
-        plot!(traj[:,1], traj[:,2], traj[:,3], label="", ls=:dash, color=:black)
-    end
-
-    return gif(anim, "plot.gif", fps=24)
-end
-
 
 ##### Energy
 function kineticenergy(sol, t)

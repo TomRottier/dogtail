@@ -781,6 +781,12 @@ git-tree-sha1 = "4dd403333bcf0909341cfe57ec115152f937d7d8"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
 version = "0.11.1"
 
+[[ParallelDataTransfer]]
+deps = ["Distributed", "Random", "Test"]
+git-tree-sha1 = "75e75900c8b0d8dfb69cbe082832b1dc9f8aacfe"
+uuid = "2dcacdae-9679-587a-88bb-8b444fb7085b"
+version = "0.5.0"
+
 [[Parameters]]
 deps = ["OrderedCollections", "UnPack"]
 git-tree-sha1 = "2276ac65f1e236e0a6ea70baff3f62ad4c625345"
@@ -966,6 +972,14 @@ deps = ["InteractiveUtils", "MacroTools"]
 git-tree-sha1 = "daf7aec3fe3acb2131388f93a4c409b8c7f62226"
 uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
 version = "0.9.3"
+
+[[SimulatedAnnealing]]
+deps = ["Distributed", "ParallelDataTransfer"]
+git-tree-sha1 = "0bfa14345e8a8d2a4a5a26039a302e7113906bb6"
+repo-rev = "main"
+repo-url = "C:\\Users\\tomro\\SimulatedAnnealing"
+uuid = "15bc398e-2416-4ff5-8102-551df81d6bf8"
+version = "0.1.0"
 
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
