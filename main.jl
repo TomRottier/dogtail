@@ -2,23 +2,22 @@ using Plots, OrdinaryDiffEq, StaticArrays, BlackBoxOptim, Parameters, Evolutiona
 using DelimitedFiles, Statistics, LinearAlgebra, Distributed
 
 # Parallel version
-using Plots
-using Distributed
-addprocs(4)
-@everywhere begin
-    # using Pkg; Pkg.activate(".")
-    using OrdinaryDiffEq, StaticArrays, Parameters, SimulatedAnnealing
-    using DelimitedFiles, StaticArrays, Statistics, LinearAlgebra
+# using Plots
+# using Distributed
+# addprocs(4)
+# @everywhere begin
+#     # using Pkg; Pkg.activate(".")
+#     using OrdinaryDiffEq, StaticArrays, Parameters, SimulatedAnnealing
+#     using DelimitedFiles, StaticArrays, Statistics, LinearAlgebra
 
-    include("getdata.jl")
-    include("parameters.jl")
-    include("orientations.jl")
-    include("initconds.jl")
-    include("model/eom.jl")
-    include("cost.jl")
-    include("model/functions.jl")
-    
-end
+#     include("getdata.jl")
+#     include("parameters.jl")
+#     include("orientations.jl")
+#     include("initconds.jl")
+#     include("model/eom.jl")
+#     include("cost.jl")
+#     include("model/functions.jl")
+# end
 
 include("getdata.jl")
 include("parameters.jl")
@@ -49,6 +48,7 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
         times = collect(range(tspan[1], tspan[2], length=size(base, 1)))
         # u₀ = [orientations[i][1] for i ∈ eachindex(orientations)]
         # prob = ODEProblem(eom!, u₀, tspan, p)
+        orientations[10] .= 0.0
         u₀_SA = SVector{12,Float64}([orientations[j][1] for j ∈ eachindex(orientations)])
         prob = ODEProblem(eom_SA, u₀_SA, tspan, p)        
     end

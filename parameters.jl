@@ -21,9 +21,9 @@
     kb = 0.01
     ba = 0.001
     bb = 0.001
-    eqX = 0.0
-    eqY = 0.0
-    eqZ = 0.0
+    eqx = 0.0
+    eqy = 0.0
+    eqz = 0.0
 end
 
 # Set parameters for model
@@ -35,14 +35,14 @@ function initialise_parameters(fx, fy, fz, la, lb)
 end
 
 function update_parameters!(pin, p::Params)
-    @inbounds ma, mb, ka, kb, ba, bb, eqX, eqY, eqZ = pin
+    @inbounds ma, mb, ka, kb, ba, bb, eqx, eqy, eqz = pin
     @unpack la, lb, r = p
     # Update inertial parameters of tail segments from masses
     ixa = 0.5 * ma * r^2; ixb = 0.5 * mb * r^2
     iya = iza = 1 / 12 * ma * (3 * r^2 + la^2)
     iyb = izb = 1 / 12 * mb * (3 * r^2 + lb^2)
 
-    return  @pack! p = ixa, ixb, iya, iyb, iza, izb, ma, mb, ka, kb, ba, bb, eqX, eqY, eqZ
+    return  @pack! p = ixa, ixb, iya, iyb, iza, izb, ma, mb, ka, kb, ba, bb, eqx, eqy, eqz
 end
 
 

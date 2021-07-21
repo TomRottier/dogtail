@@ -27,6 +27,10 @@ constants eqx,eqy,eqz
 constants g
 specified px'', py'', pz''  % Position and derivatives of base
 %--------------------------------------------------------------------
+%   Motion constraints
+dependent[1] = u4
+constrain( dependent[u4] )
+%--------------------------------------------------------------------
 %   Geometry relating unit vectors
 dircos(n, a, body123, q1, q2, q3)
 dircos(a, b, body123, q4, q5, q6)
@@ -37,8 +41,6 @@ p_p1_ao> = lao*a1>                  % From base to CoM of first seg
 p_p1_p2> = la*a1>                   % From base of first to base of second seg
 p_p2_bo> = lbo*b1>  
 p_p2_p3> = lb*b1>   
-%--------------------------------------------------------------------
-%   Motion constraints
 %--------------------------------------------------------------------
 %    Angular velocity of pendulum
 w_a_n> = u1*a1> + u2*a2> + u3*a3>
@@ -68,7 +70,6 @@ a_bo_n> = dt(v_bo_n>, n)
 %--------------------------------------------------------------------
 %   Forces and torques
 gravity(g*n3>)
-
 ator> = -ka*((q1-eqx)*a1> + (q2-eqy)*a2> + (q3-eqz)*a3>) - ba*w_a_n>
 btor> = -kb*(q4*b1> + q5*b2> + q6*b3>) - bb*w_b_a>
 torque(a, ator>)
@@ -122,4 +123,4 @@ input abserr=1.0e-08, relerr=1.0e-07
 %--------------------------------------------------------------------
 %   generate code
 %code nonlinear(out,u1,u2,u3,u4,u5,u6) invkin.f
-code dynamics() dogtail.f, nosubs
+code dynamics() model/dogtail.f, nosubs
