@@ -3,6 +3,8 @@ function p2(sol, t)
     @unpack la, fx, fy, fz = sol.prob.p
     q1, q2, q3 = sol(t)
 
+    px = fx(t); py = fy(t); pz = fz(t)
+
     s1 = sin(q1); s2 = sin(q2); s3 = sin(q3);
     c1 = cos(q1); c2 = cos(q2); c3 = cos(q3);
     
@@ -14,10 +16,12 @@ function p2(sol, t)
 end
 
 function p3(sol, t; retp2=false)
-    @unpack lb = sol.prob.p
+    @unpack la, lb, fx, fy, fz = sol.prob.p
     q1, q2, q3, q4, q5, q6 = sol(t)
 
-    p2x, p2y, p2z = p2(sol, t)
+    px = fx(t); py = fy(t); pz = fz(t)
+
+    retp2 && (p2x, p2y, p2z = p2(sol, t))
 
     s1 = sin(q1); s2 = sin(q2); s3 = sin(q3); s4 = sin(q4); s5 = sin(q5); s6 = sin(q6)
     c1 = cos(q1); c2 = cos(q2); c3 = cos(q3); c4 = cos(q4); c5 = cos(q5); c6 = cos(q6)

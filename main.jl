@@ -35,7 +35,7 @@ mids = similar(mids_sim)
 tips = similar(mids)
 dognames = Vector{String}(undef, length(fnames))
 
-Threads.@threads for (i, fname) in collect(enumerate(fnames))
+#= Threads.@threads =# for (i, fname) in collect(enumerate(fnames))
     # Get data for trial
     println(i)
     @everywhere splx, sply, splz, time, base, mid, tip, orientations, la, lb, tspan = getdata("Data/" * $fname)
@@ -56,10 +56,10 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     # Find optimal parameters
 
     # Using BlackBoxOptim
-    # bounds = [(0.05, 0.6), (0.05, 0.6), (0.0001, 0.002), (0.0002, 0.001), (1e-6, 0.0002), (1e-6, 0.0002), (-π, π), (-π, π), (-π, π)]
-    # res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=1000, ftol=1e-4)
-    # opt = best_candidate(res)
-    # score = best_fitness(res)
+    bounds = [(0.05, 0.6), (0.05, 0.6), (0.0001, 0.01), (0.0002, 0.01), (1e-6, 0.01), (1e-6, 0.01), (-π, π), (-π, π), (-π, π)]
+    res = bboptimize(x -> cost(x, p, prob, times, mid, tip), SearchRange=bounds, NumDimensions=length(bounds), MaxFuncEvals=100, ftol=1e-4)
+    opt = best_candidate(res)
+    score = best_fitness(res)
 
     # Using Evolutionary.jl
     # lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
@@ -70,13 +70,13 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     # res = Evolutionary.optimize(x -> cost(x, p, prob, time, mid, tip), lb, ub, x₀, ga, opts)
 
     # Using my SimulatedAnnealing
-    lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
-    ub = [0.5, 0.5, 0.005, 0.005, 0.0002, 0.0002, π, π, π]
-    x₀ = @. lb + (ub - lb) / 2
-    options = Options(func=x -> cost(x, p, prob, times, mid, tip), N=9, lb=lb, ub=ub, tol=1e-5, print_status=true)
-    current = State(f=options.f(x₀), x=x₀, v=ub .- lb, T=5.0)
-    result = Result(options.f(x₀), x₀)
-    sa!(current, result, options)
+    # lb = [0.05, 0.05, 0.0001, 0.0001, 1e-6, 1e-6, -π, -π, -π]
+    # ub = [0.5, 0.5, 0.005, 0.005, 0.0002, 0.0002, π, π, π]
+    # x₀ = @. lb + (ub - lb) / 2
+    # options = Options(func=x -> cost(x, p, prob, times, mid, tip), N=9, lb=lb, ub=ub, tol=1e-3, print_status=true)
+    # current = State(f=options.f(x₀), x=x₀, v=ub .- lb, T=0.001)
+    # result = Result(options.f(x₀), x₀)
+    # sa!(current, result, options)
 
 
     # Call cost with optimal paramters
@@ -84,14 +84,14 @@ Threads.@threads for (i, fname) in collect(enumerate(fnames))
     mids_sim[i] = mid_sim; tips_sim[i] = tip_sim
 
     # Save to file
-    name = split(fname, ".")[1]
-    open("results.csv", "a") do io
-        writedlm(io, [name  opt... score], ',')
-    end
-    open("SimData/" * name * ".csv", "w") do io
-        header = ["time" "midX" "midY" "midZ" "tipX" "tipY" "tipZ"]
-        writedlm(io, [ header; times mid_sim tip_sim], ',')
-    end
+    # name = split(fname, ".")[1]
+    # open("results.csv", "a") do io
+    #     writedlm(io, [name  opt... score], ',')
+    # end
+    # open("SimData/" * name * ".csv", "w") do io
+    #     header = ["time" "midX" "midY" "midZ" "tipX" "tipY" "tipZ"]
+    #     writedlm(io, [ header; times mid_sim tip_sim], ',')
+    # end
 
 end
 
