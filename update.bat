@@ -5,4 +5,4 @@ del .\model\dogtail.dir
 del .\model\dogtail.in
 
 @REM Run Julia script to update equations
-julia getequations.jl
+julia parseModel.jl

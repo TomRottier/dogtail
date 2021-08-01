@@ -1,7 +1,7 @@
 # File generated automatically from dogtail.f
 function ke(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -26,7 +26,7 @@ ke(sol) = [ke(sol, t) for t ∈ sol.t]
 
 function pe(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -51,7 +51,7 @@ pe(sol) = [pe(sol, t) for t ∈ sol.t]
 
 function amomx(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -76,7 +76,7 @@ amomx(sol) = [amomx(sol, t) for t ∈ sol.t]
 
 function amomy(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -101,7 +101,7 @@ amomy(sol) = [amomy(sol, t) for t ∈ sol.t]
 
 function amomz(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -126,7 +126,7 @@ amomz(sol) = [amomz(sol, t) for t ∈ sol.t]
 
 function p1x(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -151,7 +151,7 @@ p1x(sol) = [p1x(sol, t) for t ∈ sol.t]
 
 function p1y(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -176,7 +176,7 @@ p1y(sol) = [p1y(sol, t) for t ∈ sol.t]
 
 function p1z(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -201,7 +201,7 @@ p1z(sol) = [p1z(sol, t) for t ∈ sol.t]
 
 function p2x(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -226,7 +226,7 @@ p2x(sol) = [p2x(sol, t) for t ∈ sol.t]
 
 function p2y(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -251,7 +251,7 @@ p2y(sol) = [p2y(sol, t) for t ∈ sol.t]
 
 function p2z(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -276,7 +276,7 @@ p2z(sol) = [p2z(sol, t) for t ∈ sol.t]
 
 function p3x(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -301,7 +301,7 @@ p3x(sol) = [p3x(sol, t) for t ∈ sol.t]
 
 function p3y(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)
@@ -326,7 +326,7 @@ p3y(sol) = [p3y(sol, t) for t ∈ sol.t]
 
 function p3z(sol, t)
 	@unpack ba, bb, eqx, eqy, eqz, g, ixa, ixb, iya, iyb, iza, izb, ka, kb, la, lao, lb, lbo, ma, mb, ox, oy, oz, px, py, pz = sol.prob.p
-	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6 = sol(t)
+	@inbounds q1, q2, q3, q4, q5, q6, u1, u2, u3, u5, u6 = sol(t)
 
 	oxp = derivative(ox, t, 1)
 	oyp = derivative(oy, t, 1)

@@ -243,24 +243,18 @@ end
 
 # creatModel function, allows z array to be visible to eom function
 createModelS =
-"$msg
-# Create model
+"$( eomS )
 
+# Create model
 function createModel(fname)
     
     # Parameters
     px, py, pz, ox, oy, oz,  time, base, mid, tip, initconds, la, lb, tspan = getdata(fname)
-	deleteat!(orientations, 10) # Remove u4 
+	deleteat!(initconds, 10) # Remove u4 
     p = initialise_parameters(px, py, pz, ox, oy, oz, la, lb)
-	@unpack g, ma, mb, lao, lbo, ixb, iya, iyb, iza, izb, z = p
 
     # Initial conditions
     u₀ = SVector{11,Float64}(initconds)
-
-    # Evaluate constants
-    $(join(constants, "\n\t"))
-
-$(replace(eomS, r"(.*\n)" => s"\t\1"))
 
     prob = ODEProblem(eom, u₀, tspan, p)
 
@@ -307,6 +301,68 @@ open("model/functions.jl", "w") do io
     write(io, functionsS)
 end
 
+
+parametersS =
+"$msg
+# Parameters struct
+@with_kw mutable struct Params{T} @deftype T
+    z::Vector{Float64} = Vector{Float64}(undef, $(z_array))
+    la
+    lb
+    lao = 0.5 * la
+    lbo = 0.5 * lb
+    ma = 0.3
+    mb = 0.3
+    r = 0.01
+    ixa = 0.5 * ma * r^2
+    ixb = 0.5 * mb * r^2
+    iya = 1 / 12 * ma * (3 * r^2 + la^2)
+    iyb = 1 / 12 * mb * (3 * r^2 + lb^2)
+    iza = 1 / 12 * ma * (3 * r^2 + la^2)
+    izb = 1 / 12 * mb * (3 * r^2 + lb^2)
+    g = -9.81
+    $( join(specified_functions, "::Union{Float64,Spline1D}\n\t") )::Union{Float64,Spline1D}
+    ka = 0.01
+    kb = 0.01
+    ba = 0.001
+    bb = 0.001
+    eqx = 0.0
+    eqy = 0.0
+    eqz = 0.0
+end
+
+# Set parameters for model
+function initialise_parameters(px, py, pz, ox, oy, oz, la, lb)
+    # Calculate inertial parameters of tail segments assuming solid cylinders of uniform density
+    lao = 0.5 * la; lbo = 0.5 * lb
+    p = Params(la=la, lb=lb, lao=lao, lbo=lbo, px=px, py=py, pz=pz, ox=ox, oy=oy, oz=oz)
+    @unpack $( join(functionNeeds(constants, parameters), ", ") ), z = p
+
+    # Evaluate constants
+    $( join(constants, "\n\t") )
+
+    return p
+end
+
+function update_parameters!(p::Params, pin)
+    @inbounds ma, mb, ka, kb, ba, bb, eqx, eqy, eqz = pin
+    @unpack la, lb, r, g, lao, lbo, la,  z = p
+
+    # Update inertial parameters of tail segments from masses
+    ixa = 0.5 * ma * r^2; ixb = 0.5 * mb * r^2
+    iya = iza = 1 / 12 * ma * (3 * r^2 + la^2)
+    iyb = izb = 1 / 12 * mb * (3 * r^2 + lb^2)
+
+    # Update constants
+    $( join(constants, "\n\t") )
+
+    return  @pack! p = ixa, ixb, iya, iyb, iza, izb, ma, mb, ka, kb, ba, bb, eqx, eqy, eqz
+end
+"
+
+open("parameters.jl","w") do io
+    write(io, parametersS)
+end
 
 
 # spec = functionNeeds(f, specified)

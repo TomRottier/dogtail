@@ -1,20 +1,20 @@
 C**   The name of this program is model/dogtail.f
-C**   Created by AUTOLEV 3.2 on Thu Jul 29 19:04:23 2021
+C**   Created by AUTOLEV 3.2 on Sun Aug 01 15:12:14 2021
 
       IMPLICIT         DOUBLE PRECISION (A - Z)
       INTEGER          ILOOP, IPRINT, PRINTINT
       CHARACTER        MESSAGE(99)
       EXTERNAL         EQNS1
-      DIMENSION        VAR(12)
+      DIMENSION        VAR(11)
       COMMON/CONSTNTS/ BA,BB,EQX,EQY,EQZ,G,IXA,IXB,IYA,IYB,IZA,IZB,KA,KB
      &,LA,LAO,LB,LBO,MA,MB
       COMMON/SPECFIED/ OX,OY,OZ,PX,PY,PZ,OXp,OYp,OZp,PXp,PYp,PZp,OXpp,OY
      &pp,OZpp,PXpp,PYpp,PZpp
-      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U4,U5,U6
-      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORX,BTORY,BTORZ,Q1p,Q2p,Q3p,Q
-     &4p,Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1
-     &Z,P2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
-      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(269),COEF(6,6),RHS(6)
+      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U5,U6
+      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORY,BTORZ,U4,Q1p,Q2p,Q3p,Q4p,
+     &Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1Z,P
+     &2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
+      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(268),COEF(5,5),RHS(5)
 
 C**   Open input and output files
       OPEN(UNIT=20, FILE='model/dogtail.in', STATUS='OLD')
@@ -29,8 +29,7 @@ C**   Read values of constants from input file
      &B,IZA,IZB,KA,KB,LA,LAO,LB,LBO,MA,MB
 
 C**   Read the initial value of each variable from input file
-      READ(20,7010,END=7100,ERR=7101) Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U4,U5,U
-     &6
+      READ(20,7010,END=7100,ERR=7101) Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U5,U6
 
 C**   Read integration parameters from input file
       READ(20,7011,END=7100,ERR=7101) TINITIAL,TFINAL,INTEGSTP,PRINTINT,
@@ -47,19 +46,22 @@ C**   Degree to radian conversion
       RADtoDEG = 180.0D0/PI
 
 C**   Evaluate constants
+      U4 = 0
+      U4p = 0
       Z(135) = G*MA
       Z(136) = G*MB
       Z(156) = LAO*Z(135)
       Z(159) = LBO*Z(136)
+      Z(180) = IXB*U4
       Z(219) = LBO*MB
       Z(223) = IYA + MA*LAO**2
       Z(224) = LA**2
       Z(230) = LAO*MA
       Z(232) = IZA + MA*LAO**2
-      Z(240) = IYB + MB*LBO**2
-      Z(245) = IZB + MB*LBO**2
-      Z(256) = MA + MB
-      Z(261) = LA*MB
+      Z(239) = IYB + MB*LBO**2
+      Z(244) = IZB + MB*LBO**2
+      Z(255) = MA + MB
+      Z(260) = LA*MB
 
 C**   Initialize time, print counter, variables array for integrator
       T      = TINITIAL
@@ -73,12 +75,11 @@ C**   Initialize time, print counter, variables array for integrator
       VAR(7) = U1
       VAR(8) = U2
       VAR(9) = U3
-      VAR(10) = U4
-      VAR(11) = U5
-      VAR(12) = U6
+      VAR(10) = U5
+      VAR(11) = U6
 
 C**   Initalize numerical integrator with call to EQNS1 at T=TINITIAL
-      CALL KUTTA(EQNS1, 12, VAR, T, INTEGSTP, ABSERR, RELERR, 0, *5920)
+      CALL KUTTA(EQNS1, 11, VAR, T, INTEGSTP, ABSERR, RELERR, 0, *5920)
 
 C**   Numerically integrate; print results
 5900  IF( TFINAL.GE.TINITIAL .AND. T+.01D0*INTEGSTP.GE.TFINAL) IPRINT=-7
@@ -88,7 +89,7 @@ C**   Numerically integrate; print results
         IF( IPRINT .EQ. -7 ) GOTO 5930
         IPRINT = PRINTINT
       ENDIF
-      CALL KUTTA(EQNS1, 12, VAR, T, INTEGSTP, ABSERR, RELERR, 1, *5920)
+      CALL KUTTA(EQNS1, 11, VAR, T, INTEGSTP, ABSERR, RELERR, 1, *5920)
       IPRINT = IPRINT - 1
       GOTO 5900
 
@@ -133,11 +134,11 @@ C**********************************************************************
      &,LA,LAO,LB,LBO,MA,MB
       COMMON/SPECFIED/ OX,OY,OZ,PX,PY,PZ,OXp,OYp,OZp,PXp,PYp,PZp,OXpp,OY
      &pp,OZpp,PXpp,PYpp,PZpp
-      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U4,U5,U6
-      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORX,BTORY,BTORZ,Q1p,Q2p,Q3p,Q
-     &4p,Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1
-     &Z,P2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
-      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(269),COEF(6,6),RHS(6)
+      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U5,U6
+      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORY,BTORZ,U4,Q1p,Q2p,Q3p,Q4p,
+     &Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1Z,P
+     &2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
+      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(268),COEF(5,5),RHS(5)
 
 C**   Update variables after integration step
       Q1 = VAR(1)
@@ -149,14 +150,12 @@ C**   Update variables after integration step
       U1 = VAR(7)
       U2 = VAR(8)
       U3 = VAR(9)
-      U4 = VAR(10)
-      U5 = VAR(11)
-      U6 = VAR(12)
+      U5 = VAR(10)
+      U6 = VAR(11)
 
       ATORX = BA*EQX*EQY*EQZ*KA*T
       ATORY = BA*KA*T
       ATORZ = BA*KA*T
-      BTORX = BB*KB*T
       BTORY = BB*KB*T
       BTORZ = BB*KB*T
 
@@ -254,7 +253,6 @@ C**   Update variables after integration step
       Z(162) = IXA*U1
       Z(166) = IYA*U2
       Z(170) = IZA*U3
-      Z(180) = IXB*U4
       Z(181) = IXB*Z(31)*U1
       Z(182) = IXB*Z(37)*U2
       Z(183) = IXB*Z(40)*U3
@@ -301,12 +299,12 @@ C**   Update variables after integration step
      &42)*Z(75))
       Z(236) = IYB*Z(41) + Z(219)*(Z(75)+LA*Z(39))
       Z(237) = IZB*Z(42) + Z(219)*(Z(71)+LA*Z(38))
-      Z(241) = Z(205) + Z(219)*(Z(74)+LA*Z(42))
-      Z(242) = Z(206) + Z(219)*(Z(75)+LA*Z(39))
-      Z(243) = -Z(207) - Z(219)*Z(73)
-      Z(246) = Z(209) + Z(219)*Z(70)
-      Z(247) = Z(210) + Z(219)*(Z(71)+LA*Z(38))
-      Z(248) = -Z(211) - Z(219)*(Z(69)+LA*Z(41))
+      Z(240) = Z(205) + Z(219)*(Z(74)+LA*Z(42))
+      Z(241) = Z(206) + Z(219)*(Z(75)+LA*Z(39))
+      Z(242) = -Z(207) - Z(219)*Z(73)
+      Z(245) = Z(209) + Z(219)*Z(70)
+      Z(246) = Z(210) + Z(219)*(Z(71)+LA*Z(38))
+      Z(247) = -Z(211) - Z(219)*(Z(69)+LA*Z(41))
 
 C**   Quantities to be specified
       OX = 0
@@ -595,69 +593,54 @@ C**   Quantities to be specified
      &(38)*Z(71)*Z(109)+Z(39)*Z(75)*Z(109)+Z(41)*Z(71)*Z(110)-PXpp*Z(75)
      &*Z(152)-PYpp*Z(75)*Z(153)-PZpp*Z(75)*Z(154)-Z(33)*Z(71)*Z(108)-Z(3
      &4)*Z(75)*Z(108)-Z(75)*Z(134)-LA*Z(39)*Z(134)-Z(42)*Z(75)*Z(110))
-      Z(239) = Z(204) + Z(215)
-      Z(244) = Z(208) + Z(214) + Z(219)*(Z(39)*Z(109)-PXpp*Z(152)-PYpp*Z
+      Z(243) = Z(208) + Z(214) + Z(219)*(Z(39)*Z(109)-PXpp*Z(152)-PYpp*Z
      &(153)-PZpp*Z(154)-Z(34)*Z(108)-Z(134)-Z(42)*Z(110))
-      Z(249) = Z(212) + Z(213) - Z(219)*(Z(33)*Z(108)-PXpp*Z(149)-PYpp*Z
+      Z(248) = Z(212) + Z(213) - Z(219)*(Z(33)*Z(108)-PXpp*Z(149)-PYpp*Z
      &(150)-PZpp*Z(151)-Z(133)-Z(38)*Z(109)-Z(41)*Z(110))
-      Z(250) = Z(155) - Z(222)
-      Z(251) = Z(157) - Z(231)
-      Z(252) = Z(158) - Z(238)
-      Z(253) = BTORX - Z(239)
-      Z(254) = Z(160) - Z(244)
-      Z(255) = Z(161) - Z(249)
+      Z(250) = Z(155) - Z(222) - Z(201)*U4p
+      Z(251) = Z(157) - Z(231) - Z(202)*U4p
+      Z(252) = Z(158) - Z(238) - Z(203)*U4p
+      Z(253) = Z(160) - Z(243)
+      Z(254) = Z(161) - Z(248)
 
       COEF(1,1) = -Z(216)
       COEF(1,2) = -Z(217)
       COEF(1,3) = -Z(218)
-      COEF(1,4) = -Z(201)
-      COEF(1,5) = -Z(221)
-      COEF(1,6) = -Z(220)
+      COEF(1,4) = -Z(221)
+      COEF(1,5) = -Z(220)
       COEF(2,1) = -Z(226)
       COEF(2,2) = -Z(225)
       COEF(2,3) = -Z(227)
-      COEF(2,4) = -Z(202)
-      COEF(2,5) = -Z(228)
-      COEF(2,6) = -Z(229)
+      COEF(2,4) = -Z(228)
+      COEF(2,5) = -Z(229)
       COEF(3,1) = -Z(234)
       COEF(3,2) = -Z(235)
       COEF(3,3) = -Z(233)
-      COEF(3,4) = -Z(203)
-      COEF(3,5) = -Z(236)
-      COEF(3,6) = -Z(237)
-      COEF(4,1) = -Z(201)
-      COEF(4,2) = -Z(202)
-      COEF(4,3) = -Z(203)
-      COEF(4,4) = -IXB
+      COEF(3,4) = -Z(236)
+      COEF(3,5) = -Z(237)
+      COEF(4,1) = -Z(242)
+      COEF(4,2) = -Z(240)
+      COEF(4,3) = -Z(241)
+      COEF(4,4) = -Z(239)
       COEF(4,5) = 0
-      COEF(4,6) = 0
-      COEF(5,1) = -Z(243)
-      COEF(5,2) = -Z(241)
-      COEF(5,3) = -Z(242)
+      COEF(5,1) = -Z(245)
+      COEF(5,2) = -Z(247)
+      COEF(5,3) = -Z(246)
       COEF(5,4) = 0
-      COEF(5,5) = -Z(240)
-      COEF(5,6) = 0
-      COEF(6,1) = -Z(246)
-      COEF(6,2) = -Z(248)
-      COEF(6,3) = -Z(247)
-      COEF(6,4) = 0
-      COEF(6,5) = 0
-      COEF(6,6) = -Z(245)
+      COEF(5,5) = -Z(244)
       RHS(1) = -Z(250)
       RHS(2) = -Z(251)
       RHS(3) = -Z(252)
       RHS(4) = -Z(253)
       RHS(5) = -Z(254)
-      RHS(6) = -Z(255)
-      CALL SOLVE(6,COEF,RHS,VARp)
+      CALL SOLVE(5,COEF,RHS,VARp)
 
 C**   Update variables after uncoupling equations
       U1p = VARp(1)
       U2p = VARp(2)
       U3p = VARp(3)
-      U4p = VARp(4)
-      U5p = VARp(5)
-      U6p = VARp(6)
+      U5p = VARp(4)
+      U6p = VARp(5)
 
 C**   Update derivative array prior to integration step
       VARp(1) = Q1p
@@ -669,9 +652,8 @@ C**   Update derivative array prior to integration step
       VARp(7) = U1p
       VARp(8) = U2p
       VARp(9) = U3p
-      VARp(10) = U4p
-      VARp(11) = U5p
-      VARp(12) = U6p
+      VARp(10) = U5p
+      VARp(11) = U6p
 
       RETURN
       END
@@ -685,11 +667,11 @@ C**********************************************************************
      &,LA,LAO,LB,LBO,MA,MB
       COMMON/SPECFIED/ OX,OY,OZ,PX,PY,PZ,OXp,OYp,OZp,PXp,PYp,PZp,OXpp,OY
      &pp,OZpp,PXpp,PYpp,PZpp
-      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U4,U5,U6
-      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORX,BTORY,BTORZ,Q1p,Q2p,Q3p,Q
-     &4p,Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1
-     &Z,P2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
-      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(269),COEF(6,6),RHS(6)
+      COMMON/VARIBLES/ Q1,Q2,Q3,Q4,Q5,Q6,U1,U2,U3,U5,U6
+      COMMON/ALGBRAIC/ ATORX,ATORY,ATORZ,BTORY,BTORZ,U4,Q1p,Q2p,Q3p,Q4p,
+     &Q5p,Q6p,U1p,U2p,U3p,U4p,U5p,U6p,AMOMX,AMOMY,AMOMZ,KE,P1X,P1Y,P1Z,P
+     &2X,P2Y,P2Z,P3X,P3Y,P3Z,PE,TE
+      COMMON/MISCLLNS/ PI,DEGtoRAD,RADtoDEG,Z(268),COEF(5,5),RHS(5)
 
 C**   Evaluate output quantities
       Z(146) = Z(31)*Z(137) + Z(37)*Z(140) + Z(40)*Z(143)
@@ -754,47 +736,47 @@ C**   Evaluate output quantities
      &74)*U2-Z(75)*U3)-2*Z(42)*(Z(59)-LA*U2)*(Z(73)*U1-Z(76)-LBO*U5-Z(74
      &)*U2-Z(75)*U3))
       PE = -G*(MA+MB)*(LAO+LBO+((MA+MB)*PZ+LBO*MB*Z(148)+(LA*MB+LAO*MA)*
-     &Z(139))/Z(256))
+     &Z(139))/Z(255))
       TE = PE + KE
-      Z(257) = Z(230)*(PXp*Z(138)-PYp*Z(137))
-      Z(258) = Z(230)*(PXp*Z(139)-PZp*Z(137))
-      Z(259) = Z(230)*(PYp*Z(139)-PZp*Z(138))
-      Z(260) = MB*(LA+LBO*Z(31))
-      Z(262) = Z(261)*Z(33)
-      Z(263) = Z(261)*Z(34)
-      Z(264) = MB*(LBO+LA*Z(31))
-      Z(265) = MB*(LA*PXp*Z(138)+LBO*PXp*Z(147)-LA*PYp*Z(137)-LBO*PYp*Z(
+      Z(256) = Z(230)*(PXp*Z(138)-PYp*Z(137))
+      Z(257) = Z(230)*(PXp*Z(139)-PZp*Z(137))
+      Z(258) = Z(230)*(PYp*Z(139)-PZp*Z(138))
+      Z(259) = MB*(LA+LBO*Z(31))
+      Z(261) = Z(260)*Z(33)
+      Z(262) = Z(260)*Z(34)
+      Z(263) = MB*(LBO+LA*Z(31))
+      Z(264) = MB*(LA*PXp*Z(138)+LBO*PXp*Z(147)-LA*PYp*Z(137)-LBO*PYp*Z(
      &146))
-      Z(266) = MB*(LA*PXp*Z(139)+LBO*PXp*Z(148)-LA*PZp*Z(137)-LBO*PZp*Z(
+      Z(265) = MB*(LA*PXp*Z(139)+LBO*PXp*Z(148)-LA*PZp*Z(137)-LBO*PZp*Z(
      &146))
-      Z(267) = MB*(LA*PYp*Z(139)+LBO*PYp*Z(148)-LA*PZp*Z(138)-LBO*PZp*Z(
+      Z(266) = MB*(LA*PYp*Z(139)+LBO*PYp*Z(148)-LA*PZp*Z(138)-LBO*PZp*Z(
      &147))
-      Z(268) = Z(219)*Z(37)
-      Z(269) = Z(219)*Z(40)
-      AMOMX = Z(137)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(268)*Z(105)-Z(269)*Z
-     &(104)) + Z(140)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(230)*Z(93)-Z(260)*Z
+      Z(267) = Z(219)*Z(37)
+      Z(268) = Z(219)*Z(40)
+      AMOMX = Z(137)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(267)*Z(105)-Z(268)*Z
+     &(104)) + Z(140)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(230)*Z(93)-Z(259)*Z
      &(105)) + Z(149)*(Z(191)+Z(192)+Z(193)+IYB*U5+Z(205)*U2+Z(206)*U3-Z
-     &(207)*U1-Z(264)*Z(112)) + Z(146)*(Z(184)+Z(185)+Z(186)+IXB*U4+Z(20
-     &1)*U1+Z(202)*U2+Z(203)*U3-Z(262)*Z(112)-Z(263)*Z(111)) - Z(259) - 
-     &Z(267) - Z(143)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(260)*Z
+     &(207)*U1-Z(263)*Z(112)) + Z(146)*(Z(184)+Z(185)+Z(186)+IXB*U4+Z(20
+     &1)*U1+Z(202)*U2+Z(203)*U3-Z(261)*Z(112)-Z(262)*Z(111)) - Z(258) - 
+     &Z(266) - Z(143)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(259)*Z
      &(104)) - Z(152)*(Z(211)*U2-Z(198)-Z(199)-Z(200)-IZB*U6-Z(209)*U1-Z
-     &(210)*U3-Z(264)*Z(111))
-      AMOMY = Z(258) + Z(266) + Z(138)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(26
-     &8)*Z(105)-Z(269)*Z(104)) + Z(141)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(2
-     &30)*Z(93)-Z(260)*Z(105)) + Z(150)*(Z(191)+Z(192)+Z(193)+IYB*U5+Z(2
-     &05)*U2+Z(206)*U3-Z(207)*U1-Z(264)*Z(112)) + Z(147)*(Z(184)+Z(185)+
-     &Z(186)+IXB*U4+Z(201)*U1+Z(202)*U2+Z(203)*U3-Z(262)*Z(112)-Z(263)*Z
-     &(111)) - Z(144)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(260)*Z
+     &(210)*U3-Z(263)*Z(111))
+      AMOMY = Z(257) + Z(265) + Z(138)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(26
+     &7)*Z(105)-Z(268)*Z(104)) + Z(141)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(2
+     &30)*Z(93)-Z(259)*Z(105)) + Z(150)*(Z(191)+Z(192)+Z(193)+IYB*U5+Z(2
+     &05)*U2+Z(206)*U3-Z(207)*U1-Z(263)*Z(112)) + Z(147)*(Z(184)+Z(185)+
+     &Z(186)+IXB*U4+Z(201)*U1+Z(202)*U2+Z(203)*U3-Z(261)*Z(112)-Z(262)*Z
+     &(111)) - Z(144)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(259)*Z
      &(104)) - Z(153)*(Z(211)*U2-Z(198)-Z(199)-Z(200)-IZB*U6-Z(209)*U1-Z
-     &(210)*U3-Z(264)*Z(111))
-      AMOMZ = Z(139)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(268)*Z(105)-Z(269)*Z
-     &(104)) + Z(142)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(230)*Z(93)-Z(260)*Z
+     &(210)*U3-Z(263)*Z(111))
+      AMOMZ = Z(139)*(Z(163)+Z(164)+Z(165)+IXA*U1+Z(267)*Z(105)-Z(268)*Z
+     &(104)) + Z(142)*(Z(168)+Z(169)+IYA*U2-Z(167)-Z(230)*Z(93)-Z(259)*Z
      &(105)) + Z(151)*(Z(191)+Z(192)+Z(193)+IYB*U5+Z(205)*U2+Z(206)*U3-Z
-     &(207)*U1-Z(264)*Z(112)) + Z(148)*(Z(184)+Z(185)+Z(186)+IXB*U4+Z(20
-     &1)*U1+Z(202)*U2+Z(203)*U3-Z(262)*Z(112)-Z(263)*Z(111)) - Z(257) - 
-     &Z(265) - Z(145)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(260)*Z
+     &(207)*U1-Z(263)*Z(112)) + Z(148)*(Z(184)+Z(185)+Z(186)+IXB*U4+Z(20
+     &1)*U1+Z(202)*U2+Z(203)*U3-Z(261)*Z(112)-Z(262)*Z(111)) - Z(256) - 
+     &Z(264) - Z(145)*(Z(172)-Z(171)-Z(173)-IZA*U3-Z(230)*Z(92)-Z(259)*Z
      &(104)) - Z(154)*(Z(211)*U2-Z(198)-Z(199)-Z(200)-IZB*U6-Z(209)*U1-Z
-     &(210)*U3-Z(264)*Z(111))
+     &(210)*U3-Z(263)*Z(111))
       P1X = PX
       P1Y = PY
       P1Z = PZ

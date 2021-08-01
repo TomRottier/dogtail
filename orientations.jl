@@ -1,4 +1,4 @@
-# Calculates orientaion angles, derivatives and generalised speeds
+# Calculates orientation angles, derivatives and generalised speeds
 # Body123
 using Rotations
 
@@ -33,4 +33,27 @@ function getorientation(time, base, mid, tip)
     
     return [q1, q2, q3, q4, q5, q6, u1, u2, u3, u4, u5, u6]
 
+end
+
+# Get XYZ intrinsic Euler angles
+function getorientation(v::Vector{Float64}, ref=[1,0,0])
+    # Create vector
+    v_norm = normalize(v)
+
+    # Create rotation matrix
+    r = rotation_between(ref, v_norm) |> RotXYZ
+
+    # Extract angles
+    θ₁, θ₂, θ₃ = r.theta1, r.theta2, r.theta3 
+
+    return [θ₁, θ₂, θ₃]
+end
+
+function getorientation(m::Matrix{Float64}, ref::Vector{Vector{Float64}})
+    θ = similar(m)
+    @inbounds for i ∈ 1:size(m, 1)
+        θ[i,:] = getorientation(m[i,:], ref[i])
+    end
+
+    return θ
 end

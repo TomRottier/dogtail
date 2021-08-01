@@ -1,7 +1,7 @@
 function animate_comparison(base, mid, tip, mid_sim, tip_sim)
     base_sim = copy(base)
     mins = minimum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1); maxs = maximum([base; mid; tip; base_sim; mid_sim; tip_sim], dims=1)
-
+    lims = maxs - mins |> maximum
     anim = @animate for idx ∈ 1:size(base, 1)
         # Trajectory
         plot(base[:,1], base[:,2], base[:,3], label="", ls=:dash, color=:black)
@@ -19,10 +19,10 @@ function animate_comparison(base, mid, tip, mid_sim, tip_sim)
              color=:red, lw=:2, label="")
         # Axis limits
         plot!(aspect_ratio=:equal)
-        # xlims!(mins[1], maxs[1])
-        # ylims!(mins[2], maxs[2])
-        # zlims!(mins[3], maxs[3])
-        xlims!(-0.2, 2.0); ylims!(-0.2, 2.0); zlims!(0.0, 2.2)
+        xlims!(mins[1], mins[1] + lims)
+        ylims!(mins[2], mins[2] + lims)
+        zlims!(mins[3], mins[3] + lims)
+        # xlims!(-0.2, 2.0); ylims!(-0.2, 2.0); zlims!(0.0, 2.2)
         # Camera angle
         # plot!(camera=(90,60))
     end
