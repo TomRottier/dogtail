@@ -977,7 +977,7 @@ version = "0.9.3"
 deps = ["Distributed", "ParallelDataTransfer"]
 git-tree-sha1 = "0bfa14345e8a8d2a4a5a26039a302e7113906bb6"
 repo-rev = "main"
-repo-url = "C:\\Users\\tomro\\SimulatedAnnealing"
+repo-url = "https://github.com/TomRottier/SimulatedAnnealing.jl.git"
 uuid = "15bc398e-2416-4ff5-8102-551df81d6bf8"
 version = "0.1.0"
 

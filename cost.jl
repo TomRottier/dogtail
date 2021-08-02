@@ -7,7 +7,7 @@ function cost(pin, p, prob, times, mid, tip)
 
     # Solve
     sol = solve(newprob, Tsit5(), abstol=1e-5, reltol=1e-5, saveat=times)
-    sol.retcode == :MaxIters  && return 1.0
+    sol.retcode == :MaxIters  && (println(pin),return 1.0)
     sol.retcode == :DtLessThanMin && return 2.0
 
     # Compare simulation output to measured data
